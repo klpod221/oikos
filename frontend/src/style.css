@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+svg {
+  vertical-align: initial;
+}

@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Ingredient;
+use App\Models\User;
+
+class IngredientPolicy
+{
+    public function view(User $user, Ingredient $ingredient): bool
+    {
+        return $ingredient->user_id === $user->id || $ingredient->is_global;
+    }
+
+    public function create(User $__): bool
+    {
+        return true;
+    }
+
+    public function update(User $user, Ingredient $ingredient): bool
+    {
+        return $ingredient->user_id === $user->id;
+    }
+
+    public function delete(User $user, Ingredient $ingredient): bool
+    {
+        return $ingredient->user_id === $user->id;
+    }
+}

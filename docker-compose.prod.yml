@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: oikos_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: oikos
+      POSTGRES_USER: oikos
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oikos -d oikos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: oikos-backend:prod
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: oikos_backend_prod
+    restart: always
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: oikos
+      DB_USERNAME: oikos
+      DB_PASSWORD: secret
+      APP_ENV: production
+      APP_DEBUG: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+        - ./backend/storage:/var/www/html/storage
+
+  nginx_backend:
+    image: nginx:alpine
+    container_name: oikos_nginx_backend_prod
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+
+  frontend:
+    image: oikos-frontend:prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: oikos_frontend_prod
+    restart: always
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data_prod:

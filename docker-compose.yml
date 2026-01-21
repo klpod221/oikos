@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: oikos_postgres
+    environment:
+      POSTGRES_DB: oikos
+      POSTGRES_USER: oikos
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oikos -d oikos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: oikos-backend:dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: oikos_backend
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: oikos
+      DB_USERNAME: oikos
+      DB_PASSWORD: secret
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan migrate:status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: oikos-frontend:dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: oikos_frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_PROXY_TARGET: http://backend:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

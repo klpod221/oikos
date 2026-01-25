@@ -13,21 +13,7 @@ class AdminUserService
      */
     public function getUsers(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return User::query()
-            ->when(isset($filters['search']), function (Builder $query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'ilike', "%{$search}%")
-                        ->orWhere('email', 'ilike', "%{$search}%");
-                });
-            })
-            ->when(isset($filters['role']), function (Builder $query, $role) {
-                $query->where('role', $role);
-            })
-            ->when(isset($filters['status']), function (Builder $query, $status) {
-                $query->where('status', $status);
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        return User::applyFilters($filters)->paginate($perPage);
     }
 
     /**

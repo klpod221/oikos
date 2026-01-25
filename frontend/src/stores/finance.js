@@ -7,6 +7,11 @@ export const useFinanceStore = defineStore("finance", () => {
   // State
   const wallets = ref([]);
   const transactions = ref([]);
+  const transactionPagination = ref({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
   const categories = ref([]);
   const savingsGoals = ref([]);
   const loading = ref(false);
@@ -89,6 +94,14 @@ export const useFinanceStore = defineStore("finance", () => {
     try {
       const res = await financeService.getTransactions(params);
       transactions.value = res.data.data || [];
+      const meta = res.data.meta;
+      if (meta) {
+        transactionPagination.value = {
+          current: meta.current_page,
+          pageSize: Number(res.data.meta.per_page || 10), // Backend might not return per_page in meta if using standard Laravel resource collection sometimes, but Controller does return it in meta.
+          total: meta.total,
+        };
+      }
     } catch (e) {
       console.error("Failed to fetch transactions", e);
     } finally {
@@ -197,6 +210,7 @@ export const useFinanceStore = defineStore("finance", () => {
     // State
     wallets,
     transactions,
+    transactionPagination,
     categories,
     savingsGoals,
     loading,

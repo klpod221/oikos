@@ -16,6 +16,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: oikos_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     image: oikos-backend:dev
     build:
@@ -32,6 +45,8 @@ services:
       DB_DATABASE: oikos
       DB_USERNAME: oikos
       DB_PASSWORD: secret
+      REDIS_HOST: redis
+      CACHE_STORE: redis
     healthcheck:
       test: ["CMD-SHELL", "php artisan migrate:status"]
       interval: 10s
@@ -39,6 +54,8 @@ services:
       retries: 5
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:
@@ -60,3 +77,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

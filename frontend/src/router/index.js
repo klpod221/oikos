@@ -32,6 +32,30 @@ const routes = [
     component: () => import("../views/nutrition/Nutrition.vue"),
     meta: { requiresAuth: true },
   },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: () => import("../views/settings/Settings.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/admin/users",
+    name: "AdminUsers",
+    component: () => import("../views/admin/Users.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/categories",
+    name: "AdminCategories",
+    component: () => import("../views/admin/Categories.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/ingredients",
+    name: "AdminIngredients",
+    component: () => import("../views/admin/Ingredients.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
 ];
 
 const router = createRouter({
@@ -45,6 +69,9 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     next("/login");
   } else if (to.meta.guest && auth.isAuthenticated) {
+    next("/");
+  } else if (to.meta.requiresAdmin && !auth.isAdmin) {
+    // Redirect non-admin users trying to access admin routes
     next("/");
   } else {
     next();

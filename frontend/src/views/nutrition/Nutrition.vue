@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useNutritionStore } from "../../stores/nutrition";
 import {
   PlusOutlined,
   ExperimentOutlined,
   CoffeeOutlined,
   CalendarOutlined,
+  SearchOutlined,
 } from "@ant-design/icons-vue";
 
 // Components
@@ -21,6 +22,10 @@ const activeTab = ref("ingredients");
 const ingredientModalOpen = ref(false);
 const recipeModalOpen = ref(false);
 const editingRecipe = ref(null);
+
+// Search filters
+const ingredientSearch = ref("");
+const recipeSearch = ref("");
 
 // Forms
 const ingredientForm = ref({
@@ -48,6 +53,18 @@ const recipeForm = ref({
 
 onMounted(async () => {
   await Promise.all([nutrition.fetchIngredients(), nutrition.fetchRecipes()]);
+});
+
+// Watch ingredient search
+watch(ingredientSearch, () => {
+  nutrition.ingredientFilters.search = ingredientSearch.value;
+  nutrition.fetchIngredients(1);
+});
+
+// Watch recipe search
+watch(recipeSearch, () => {
+  nutrition.recipeFilters.search = recipeSearch.value;
+  nutrition.fetchRecipes(1);
 });
 
 // Ingredient handlers
@@ -98,18 +115,37 @@ const handleRecipeSubmit = async (data) => {
 const handleRecipeDelete = async (id) => {
   await nutrition.deleteRecipe(id);
 };
+
+const handleIngredientPageChange = (page) => {
+  nutrition.fetchIngredients(page);
+};
+
+const handleRecipePageChange = (page) => {
+  nutrition.fetchRecipes(page);
+};
+
+const handleIngredientTableChange = (pagination, filters, sorter) => {
+  if (sorter.field && sorter.order) {
+    nutrition.ingredientFilters.sort_by = sorter.field;
+    nutrition.ingredientFilters.sort_order = sorter.order === "ascend" ? "asc" : "desc";
+  } else {
+    nutrition.ingredientFilters.sort_by = "";
+    nutrition.ingredientFilters.sort_order = "desc";
+  }
+  nutrition.fetchIngredients(pagination.current || 1);
+};
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-2">
     <!-- Header -->
     <div
-      class="flex flex-col sm:flex-row justify-between sm:items-center gap-4"
+      class="flex flex-col sm:flex-row justify-between sm:items-center gap-2"
     >
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Nutrition</h1>
+        <h1 class="text-2xl font-bold text-slate-800">Dinh dưỡng</h1>
         <p class="text-slate-500">
-          Manage your ingredients, recipes, and meal plans
+          Quản lý nguyên liệu, công thức và kế hoạch ăn uống
         </p>
       </div>
     </div>
@@ -119,39 +155,72 @@ const handleRecipeDelete = async (id) => {
       <!-- Ingredients Tab -->
       <a-tab-pane key="ingredients">
         <template #tab
-          ><span><ExperimentOutlined /> Ingredients</span></template
+          ><span><ExperimentOutlined /> Nguyên liệu</span></template
         >
-        <div class="mb-4 flex justify-end">
+        <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-between">
+          <a-input
+            v-model:value="ingredientSearch"
+            placeholder="Tìm kiếm nguyên liệu..."
+            allow-clear
+            class="w-full sm:w-64"
+          >
+            <template #prefix>
+              <SearchOutlined class="text-slate-400" />
+            </template>
+          </a-input>
           <a-button type="primary" @click="openIngredientModal">
             <template #icon><PlusOutlined /></template>
-            Add Ingredient
+            Thêm nguyên liệu
           </a-button>
         </div>
         <IngredientTable
           :ingredients="nutrition.ingredients"
           :loading="nutrition.loading"
+          @change="handleIngredientTableChange"
         />
         <div
           v-if="nutrition.ingredients.length === 0 && !nutrition.loading"
           class="text-center py-12 text-slate-500"
         >
           <ExperimentOutlined class="text-4xl mb-4 opacity-50" />
-          <p>No ingredients yet. Add your first ingredient!</p>
+          <p>Chưa có nguyên liệu. Hãy thêm nguyên liệu đầu tiên!</p>
+        </div>
+        <div
+          v-if="nutrition.ingredients.length > 0"
+          class="mt-4 flex justify-center"
+        >
+          <a-pagination
+            v-model:current="nutrition.ingredientPagination.currentPage"
+            :total="nutrition.ingredientPagination.total"
+            :page-size="nutrition.ingredientPagination.perPage"
+            :show-total="(total) => `Tổng ${total} nguyên liệu`"
+            @change="handleIngredientPageChange"
+          />
         </div>
       </a-tab-pane>
 
       <!-- Recipes Tab -->
       <a-tab-pane key="recipes">
         <template #tab
-          ><span><CoffeeOutlined /> Recipes</span></template
+          ><span><CoffeeOutlined /> Công thức</span></template
         >
-        <div class="mb-4 flex justify-end">
+        <div class="mb-4 flex flex-col sm:flex-row gap-2 justify-between">
+          <a-input
+            v-model:value="recipeSearch"
+            placeholder="Tìm kiếm công thức..."
+            allow-clear
+            class="w-full sm:w-64"
+          >
+            <template #prefix>
+              <SearchOutlined class="text-slate-400" />
+            </template>
+          </a-input>
           <a-button type="primary" @click="openRecipeModal()">
             <template #icon><PlusOutlined /></template>
-            New Recipe
+            Công thức mới
           </a-button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
           <RecipeCard
             v-for="recipe in nutrition.recipes"
             :key="recipe.id"
@@ -164,19 +233,31 @@ const handleRecipeDelete = async (id) => {
             class="col-span-full text-center py-12 text-slate-500"
           >
             <CoffeeOutlined class="text-4xl mb-4 opacity-50" />
-            <p>No recipes yet. Create your first recipe!</p>
+            <p class="text-sm">Chưa có công thức. Hãy tạo công thức đầu tiên!</p>
           </div>
+        </div>
+        <div
+          v-if="nutrition.recipes.length > 0"
+          class="mt-4 flex justify-center"
+        >
+          <a-pagination
+            v-model:current="nutrition.recipePagination.currentPage"
+            :total="nutrition.recipePagination.total"
+            :page-size="nutrition.recipePagination.perPage"
+            :show-total="(total) => `Tổng ${total} công thức`"
+            @change="handleRecipePageChange"
+          />
         </div>
       </a-tab-pane>
 
       <!-- Meal Plans Tab -->
       <a-tab-pane key="mealplans">
         <template #tab
-          ><span><CalendarOutlined /> Meal Plans</span></template
+          ><span><CalendarOutlined /> Kế hoạch ăn uống</span></template
         >
         <div class="text-center py-12 text-slate-500">
           <CalendarOutlined class="text-4xl mb-4 opacity-50" />
-          <p>Meal planning feature coming soon!</p>
+          <p>Tính năng lập kế hoạch ăn uống đang được phát triển!</p>
         </div>
       </a-tab-pane>
     </a-tabs>

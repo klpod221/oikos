@@ -19,13 +19,26 @@ Route::middleware(['auth:sanctum', 'user.active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
-    // User routes will go here
+    // User Profile & Settings
+    Route::get('/user/profile', [\App\Http\Controllers\Api\UserController::class, 'profile']);
+    Route::put('/user/profile', [\App\Http\Controllers\Api\UserController::class, 'updateProfile']);
+    Route::post('/user/avatar', [\App\Http\Controllers\Api\UserController::class, 'updateAvatar']);
+    Route::put('/user/preferences', [\App\Http\Controllers\Api\UserController::class, 'updatePreferences']);
+    Route::put('/user/password', [\App\Http\Controllers\Api\UserController::class, 'changePassword']);
 
     // Finance Module
     Route::apiResource('wallets', \App\Http\Controllers\Api\Finance\WalletController::class);
     Route::apiResource('categories', \App\Http\Controllers\Api\Finance\CategoryController::class); // User's categories
     Route::apiResource('transactions', \App\Http\Controllers\Api\Finance\TransactionController::class);
     Route::apiResource('savings-goals', \App\Http\Controllers\Api\Finance\SavingsGoalController::class);
+
+    // Statistics
+    Route::get('/statistics', [\App\Http\Controllers\Api\Finance\StatisticsController::class, 'index']);
+    Route::post('/statistics/refresh', [\App\Http\Controllers\Api\Finance\StatisticsController::class, 'refresh']);
+
+    // External Data (Weather, Exchange Rates, Metals)
+    Route::get('/external-data', [\App\Http\Controllers\Api\ExternalDataController::class, 'index']);
+    Route::post('/external-data/refresh', [\App\Http\Controllers\Api\ExternalDataController::class, 'refresh']);
 
     // Nutrition Module
     Route::apiResource('ingredients', \App\Http\Controllers\Api\Nutrition\IngredientController::class); // User custom ingredients

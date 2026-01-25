@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Ingredient extends Model
 {
     use HasFactory;
+    use \App\Traits\Filterable;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +29,35 @@ class Ingredient extends Model
         'fiber',
         'sugar',
         'image',
+    ];
+
+    /**
+     * Fields that can be filtered
+     *
+     * @var array
+     */
+    public $filterable = [];
+
+    /**
+     * Fields that can be sorted
+     *
+     * @var array
+     */
+    public $sortable = [
+        'name',
+        'calories',
+        'protein',
+        'carbs',
+        'fat',
+    ];
+
+    /**
+     * Fields that can be searched
+     *
+     * @var array
+     */
+    public $searchable = [
+        'name',
     ];
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Category extends Model
 {
     use HasFactory;
+    use \App\Traits\Filterable;
 
     /**
      * Scope constants
@@ -39,6 +40,35 @@ class Category extends Model
         'parent_id',
         'sort_order',
         'is_active',
+    ];
+
+    /**
+     * Fields that can be filtered
+     *
+     * @var array
+     */
+    public $filterable = [
+        'type',
+    ];
+
+    /**
+     * Fields that can be sorted
+     *
+     * @var array
+     */
+    public $sortable = [
+        'type',
+        'sort_order',
+        'name',
+    ];
+
+    /**
+     * Fields that can be searched
+     *
+     * @var array
+     */
+    public $searchable = [
+        'name',
     ];
 
     /**

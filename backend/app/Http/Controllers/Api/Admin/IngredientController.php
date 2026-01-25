@@ -22,7 +22,7 @@ class IngredientController extends Controller
     public function index(Request $request): JsonResponse
     {
         $ingredients = $this->ingredientService->getIngredients(
-            $request->only(['search']),
+            $request->only(['search', 'sort_by', 'sort_order']),
             $request->input('per_page', 15)
         );
 

@@ -19,11 +19,21 @@ class IngredientController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $ingredients = $this->ingredientService->getIngredients($request->user()->id);
+        $ingredients = $this->ingredientService->getIngredients(
+            $request->user()->id,
+            $request->only(['search', 'sort_by', 'sort_order']),
+            $request->input('per_page', 15)
+        );
 
         return response()->json([
             'success' => true,
             'data' => IngredientResource::collection($ingredients),
+            'meta' => [
+                'current_page' => $ingredients->currentPage(),
+                'last_page' => $ingredients->lastPage(),
+                'per_page' => $ingredients->perPage(),
+                'total' => $ingredients->total(),
+            ],
         ]);
     }
 

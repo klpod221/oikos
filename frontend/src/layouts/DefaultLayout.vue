@@ -6,12 +6,16 @@ import {
   DashboardOutlined,
   WalletOutlined,
   ExperimentOutlined,
+  SettingOutlined,
   LogoutOutlined,
   UserOutlined,
   MenuOutlined,
   CloseOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  TeamOutlined,
+  TagsOutlined,
+  CoffeeOutlined,
 } from "@ant-design/icons-vue";
 
 const router = useRouter();
@@ -55,9 +59,20 @@ watch(
 );
 
 const menuItems = [
-  { key: "/", icon: DashboardOutlined, label: "Dashboard" },
-  { key: "/finance", icon: WalletOutlined, label: "Finance" },
-  { key: "/nutrition", icon: ExperimentOutlined, label: "Nutrition" },
+  { key: "/", icon: DashboardOutlined, label: "Tổng quan" },
+  { key: "/finance", icon: WalletOutlined, label: "Tài chính" },
+  { key: "/nutrition", icon: ExperimentOutlined, label: "Dinh dưỡng" },
+  { key: "/settings", icon: SettingOutlined, label: "Cài đặt" },
+];
+
+const adminMenuItems = [
+  { key: "/admin/users", icon: TeamOutlined, label: "Quản lý người dùng" },
+  { key: "/admin/categories", icon: TagsOutlined, label: "Quản lý danh mục" },
+  {
+    key: "/admin/ingredients",
+    icon: CoffeeOutlined,
+    label: "Quản lý nguyên liệu",
+  },
 ];
 
 const handleLogout = async () => {
@@ -97,7 +112,7 @@ const toggleSidebar = () => {
           <img src="/logo.png" alt="OikOS" class="w-8 h-8" />
           <span class="text-white font-semibold text-lg">OikOS</span>
         </div>
-        <button class="text-white p-1" @click="mobileDrawerOpen = false">
+        <button class="text-white! p-1" @click="mobileDrawerOpen = false">
           <CloseOutlined />
         </button>
       </div>
@@ -110,6 +125,20 @@ const toggleSidebar = () => {
         >
           <a-menu-item
             v-for="item in menuItems"
+            :key="item.key"
+            class="rounded-lg! mb-1!"
+            @click="navigateTo(item.key)"
+          >
+            <component :is="item.icon" class="text-lg" />
+            <span>{{ item.label }}</span>
+          </a-menu-item>
+          <a-menu-divider v-if="auth.isAdmin" class="my-2! border-slate-700!" />
+          <div v-if="auth.isAdmin" class="px-4 mb-2">
+            <span class="text-xs text-slate-500">Quản trị</span>
+          </div>
+          <a-menu-item
+            v-for="item in adminMenuItems"
+            v-if="auth.isAdmin"
             :key="item.key"
             class="rounded-lg! mb-1!"
             @click="navigateTo(item.key)"
@@ -155,6 +184,20 @@ const toggleSidebar = () => {
             <component :is="item.icon" class="text-lg" />
             <span>{{ item.label }}</span>
           </a-menu-item>
+          <!-- Admin Section Divider -->
+          <div v-if="auth.isAdmin" class="my-3 px-2">
+            <div class="border-t border-slate-700"></div>
+          </div>
+          <a-menu-item
+            v-for="item in adminMenuItems"
+            v-if="auth.isAdmin"
+            :key="item.key"
+            class="rounded-lg! mb-1!"
+            @click="navigateTo(item.key)"
+          >
+            <component :is="item.icon" class="text-lg" />
+            <span>{{ item.label }}</span>
+          </a-menu-item>
         </a-menu>
       </nav>
     </a-layout-sider>
@@ -188,7 +231,7 @@ const toggleSidebar = () => {
           <div class="flex items-center gap-3 cursor-pointer">
             <div class="text-right hidden sm:block">
               <div class="text-sm font-medium text-slate-800">
-                {{ auth.user?.name || "User" }}
+                {{ auth.user?.name || "Người dùng" }}
               </div>
               <div class="text-xs text-slate-500">{{ auth.user?.email }}</div>
             </div>
@@ -198,8 +241,8 @@ const toggleSidebar = () => {
           </div>
           <template #overlay>
             <a-menu>
-              <a-menu-item key="profile">
-                <UserOutlined class="mr-2" /> Profile
+              <a-menu-item key="profile" @click="router.push('/settings')">
+                <UserOutlined class="mr-2" /> Hồ sơ & Cài đặt
               </a-menu-item>
               <a-menu-divider />
               <a-menu-item
@@ -207,7 +250,7 @@ const toggleSidebar = () => {
                 @click="handleLogout"
                 class="text-red-500!"
               >
-                <LogoutOutlined class="mr-2" /> Logout
+                <LogoutOutlined class="mr-2" /> Đăng xuất
               </a-menu-item>
             </a-menu>
           </template>
@@ -217,7 +260,7 @@ const toggleSidebar = () => {
       <!-- Content -->
       <a-layout-content class="m-4">
         <div
-          class="bg-white rounded-xl p-4 lg:p-6 max-h-[calc(100vh-96px)] overflow-y-auto"
+          class="bg-white rounded-xl p-4 lg:p-6 max-h-[calc(100vh-96px)] overflow-y-auto overflow-x-hidden"
         >
           <slot />
         </div>

@@ -3,17 +3,17 @@
 namespace App\Services\Nutrition;
 
 use App\Models\Recipe;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class RecipeService
 {
-    public function getRecipes(int $userId): Collection
+    public function getRecipes(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Recipe::where('user_id', $userId)
             ->with(['ingredients'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->applyFilters($filters)
+            ->paginate($perPage);
     }
 
     public function createRecipe(int $userId, array $data): Recipe

@@ -11,14 +11,16 @@ class WalletSeeder extends Seeder
     public function run(): void
     {
         $user = User::where('email', 'klpod221@gmail.com')->first();
-        if (!$user) return;
+        if (!$user) {
+            return;
+        }
 
         $wallets = [
             [
-                'name' => 'Cash',
+                'name' => 'Tiền mặt',
                 'balance' => 5000000,
                 'currency' => 'VND',
-                'description' => 'Daily expenses',
+                'description' => 'Chi tiêu hàng ngày',
                 'is_default' => true,
                 'icon' => '💵',
                 'color' => '#10b981',
@@ -27,7 +29,7 @@ class WalletSeeder extends Seeder
                 'name' => 'Vietcombank',
                 'balance' => 50000000,
                 'currency' => 'VND',
-                'description' => 'Salary account',
+                'description' => 'Tài khoản nhận lương',
                 'is_default' => false,
                 'icon' => '🏦',
                 'color' => '#3b82f6',
@@ -36,16 +38,16 @@ class WalletSeeder extends Seeder
                 'name' => 'Momo',
                 'balance' => 2000000,
                 'currency' => 'VND',
-                'description' => 'E-wallet for bills',
+                'description' => 'Ví thanh toán hóa đơn',
                 'is_default' => false,
                 'icon' => '📱',
                 'color' => '#ec4899',
             ],
             [
-                'name' => 'Emergency Fund',
+                'name' => 'Quỹ khẩn cấp',
                 'balance' => 1000,
                 'currency' => 'USD',
-                'description' => 'Foreign currency savings',
+                'description' => 'Tiết kiệm ngoại tệ',
                 'is_default' => false,
                 'icon' => '💰',
                 'color' => '#f59e0b',

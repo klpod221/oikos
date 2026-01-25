@@ -10,6 +10,7 @@ export const useAuthStore = defineStore("auth", () => {
   const error = ref(null);
 
   const isAuthenticated = computed(() => !!token.value);
+  const isAdmin = computed(() => user.value?.role === "admin");
 
   const login = async (credentials) => {
     loading.value = true;
@@ -22,7 +23,7 @@ export const useAuthStore = defineStore("auth", () => {
       api.defaults.headers.common.Authorization = `Bearer ${token.value}`;
       return true;
     } catch (e) {
-      error.value = e.response?.data?.message || "Login failed";
+      error.value = e.response?.data?.message || "Đăng nhập thất bại";
       return false;
     } finally {
       loading.value = false;
@@ -39,7 +40,7 @@ export const useAuthStore = defineStore("auth", () => {
       localStorage.setItem("token", token.value);
       return true;
     } catch (e) {
-      error.value = e.response?.data?.message || "Registration failed";
+      error.value = e.response?.data?.message || "Đăng ký thất bại";
       return false;
     } finally {
       loading.value = false;
@@ -65,7 +66,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = res.data.data;
     } catch (e) {
       console.error("Failed to fetch user:", e);
-      error.value = e.response?.data?.message || "Failed to fetch user";
+      error.value =
+        e.response?.data?.message || "Không thể lấy thông tin người dùng";
     } finally {
       loading.value = false;
     }
@@ -77,6 +79,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading,
     error,
     isAuthenticated,
+    isAdmin,
     login,
     register,
     logout,

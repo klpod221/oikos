@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Transaction extends Model
 {
     use HasFactory;
+    use \App\Traits\Filterable;
 
     /**
      * Type constants
@@ -32,6 +33,40 @@ class Transaction extends Model
         'transaction_date',
         'reference',
         'metadata',
+    ];
+
+    /**
+     * Fields that can be filtered
+     *
+     * @var array
+     */
+    public $filterable = [
+        'type',
+        'wallet_id',
+        'category_id',
+        'start_date' => 'transaction_date:>=',
+        'end_date' => 'transaction_date:<=',
+    ];
+
+    /**
+     * Fields that can be sorted
+     *
+     * @var array
+     */
+    public $sortable = [
+        'transaction_date',
+        'amount',
+        'created_at',
+    ];
+
+    /**
+     * Fields that can be searched
+     *
+     * @var array
+     */
+    public $searchable = [
+        'description',
+        'category.name',
     ];
 
     /**

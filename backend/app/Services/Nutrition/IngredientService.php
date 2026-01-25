@@ -3,21 +3,18 @@
 namespace App\Services\Nutrition;
 
 use App\Models\Ingredient;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class IngredientService
 {
     /**
      * Get available ingredients (Global + User Custom)
      */
-    public function getIngredients(int $userId): Collection
+    public function getIngredients(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return Ingredient::where(function ($q) use ($userId) {
-            $q->where('user_id', $userId)
-                ->orWhere('is_global', true);
-        })
-            ->orderBy('name')
-            ->get();
+        return Ingredient::availableFor($userId)
+            ->applyFilters($filters)
+            ->paginate($perPage);
     }
 
     /**

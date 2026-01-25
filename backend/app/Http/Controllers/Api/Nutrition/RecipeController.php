@@ -19,11 +19,21 @@ class RecipeController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $recipes = $this->recipeService->getRecipes($request->user()->id);
+        $recipes = $this->recipeService->getRecipes(
+            $request->user()->id,
+            $request->only(['search', 'sort_by', 'sort_order']),
+            $request->input('per_page', 15)
+        );
 
         return response()->json([
             'success' => true,
             'data' => RecipeResource::collection($recipes),
+            'meta' => [
+                'current_page' => $recipes->currentPage(),
+                'last_page' => $recipes->lastPage(),
+                'per_page' => $recipes->perPage(),
+                'total' => $recipes->total(),
+            ],
         ]);
     }
 

@@ -28,24 +28,28 @@ const handleOk = () => {
 <template>
   <a-modal
     :open="open"
-    :title="wallet ? 'Edit Wallet' : 'New Wallet'"
+    :title="wallet ? 'Chỉnh sửa ví' : 'Thêm ví mới'"
     @update:open="emit('update:open', $event)"
     @ok="handleOk"
     :confirm-loading="loading"
   >
     <a-form :model="form" layout="vertical" class="mt-4">
-      <a-form-item label="Name" required>
-        <a-input v-model:value="form.name" placeholder="My Wallet" />
+      <a-form-item label="Tên ví" required>
+        <a-input v-model:value="form.name" placeholder="Ví của tôi" />
       </a-form-item>
-      <div class="grid grid-cols-2 gap-4">
-        <a-form-item :label="wallet ? 'Current Balance' : 'Initial Balance'">
+      <div class="grid grid-cols-2 gap-2">
+        <a-form-item :label="wallet ? 'Số dư hiện tại' : 'Số dư ban đầu'">
           <a-input-number
             v-model:value="form.initial_balance"
             :min="0"
             class="w-full!"
+            :formatter="
+              (value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+            "
+            :parser="(value) => value.replace(/\$\s?|(,*)/g, '')"
           />
         </a-form-item>
-        <a-form-item label="Currency">
+        <a-form-item label="Tiền tệ">
           <a-select v-model:value="form.currency">
             <a-select-option value="VND">VND</a-select-option>
             <a-select-option value="USD">USD</a-select-option>
@@ -53,31 +57,31 @@ const handleOk = () => {
           </a-select>
         </a-form-item>
       </div>
-      <div class="grid grid-cols-2 gap-4">
-        <a-form-item label="Icon">
+      <div class="grid grid-cols-2 gap-2">
+        <a-form-item label="Biểu tượng">
           <a-select v-model:value="form.icon">
-            <a-select-option value="💰">💰 Money</a-select-option>
-            <a-select-option value="💳">💳 Card</a-select-option>
-            <a-select-option value="🏦">🏦 Bank</a-select-option>
-            <a-select-option value="📱">📱 E-Wallet</a-select-option>
-            <a-select-option value="💵">💵 Cash</a-select-option>
-            <a-select-option value="🪙">🪙 Savings</a-select-option>
+            <a-select-option value="💰">💰 Tiền</a-select-option>
+            <a-select-option value="💳">💳 Thẻ</a-select-option>
+            <a-select-option value="🏦">🏦 Ngân hàng</a-select-option>
+            <a-select-option value="📱">📱 Ví điện tử</a-select-option>
+            <a-select-option value="💵">💵 Tiền mặt</a-select-option>
+            <a-select-option value="🪙">🪙 Tiết kiệm</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="Color">
+        <a-form-item label="Màu sắc">
           <a-input v-model:value="form.color" type="color" class="h-8!" />
         </a-form-item>
       </div>
-      <a-form-item label="Description">
+      <a-form-item label="Mô tả">
         <a-textarea
           v-model:value="form.description"
-          placeholder="Optional description"
+          placeholder="Mô tả tùy chọn"
           :rows="2"
         />
       </a-form-item>
       <a-form-item>
         <a-checkbox v-model:checked="form.is_default"
-          >Set as default wallet</a-checkbox
+          >Đặt làm ví mặc định</a-checkbox
         >
       </a-form-item>
     </a-form>

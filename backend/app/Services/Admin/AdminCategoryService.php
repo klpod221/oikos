@@ -12,16 +12,9 @@ class AdminCategoryService
      */
     public function getCategories(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        return Category::system() // Use existing scope
-            ->when(isset($filters['search']), function ($query, $search) {
-                $query->where('name', 'ilike', "%{$search}%");
-            })
-            ->when(isset($filters['type']), function ($query, $type) {
-                $query->where('type', $type);
-            })
-            ->with('parent') // Load parent if any
-            ->orderBy('type')
-            ->orderBy('sort_order')
+        return Category::system()
+            ->with('parent')
+            ->applyFilters($filters)
             ->paginate($perPage);
     }
 

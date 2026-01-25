@@ -21,14 +21,14 @@ const form = reactive({
 
 const onSubmit = async () => {
   if (form.password !== form.password_confirmation) {
-    message.error("Passwords do not match");
+    message.error("Mật khẩu không khớp");
     return;
   }
   if (await auth.register(form)) {
-    message.success("Account created successfully!");
+    message.success("Tạo tài khoản thành công!");
     router.push("/");
   } else {
-    message.error(auth.error || "Registration failed");
+    message.error(auth.error || "Đăng ký thất bại");
   }
 };
 </script>
@@ -36,16 +36,16 @@ const onSubmit = async () => {
 <template>
   <div>
     <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold text-slate-800">Create Account</h1>
-      <p class="text-slate-500 mt-1">Join OikOS today</p>
+      <h1 class="text-2xl font-bold text-slate-800">Tạo tài khoản</h1>
+      <p class="text-slate-500 mt-1">Tham gia OikOS ngay hôm nay</p>
     </div>
 
     <a-form :model="form" @finish="onSubmit" layout="vertical">
       <a-form-item
         name="name"
-        :rules="[{ required: true, message: 'Please enter your name' }]"
+        :rules="[{ required: true, message: 'Vui lòng nhập tên của bạn' }]"
       >
-        <a-input v-model:value="form.name" placeholder="Full Name" size="large">
+        <a-input v-model:value="form.name" placeholder="Họ và tên" size="large">
           <template #prefix><UserOutlined /></template>
         </a-input>
       </a-form-item>
@@ -56,7 +56,7 @@ const onSubmit = async () => {
           {
             required: true,
             type: 'email',
-            message: 'Please enter a valid email',
+            message: 'Vui lòng nhập email hợp lệ',
           },
         ]"
       >
@@ -71,13 +71,13 @@ const onSubmit = async () => {
           {
             required: true,
             min: 8,
-            message: 'Password must be at least 8 characters',
+            message: 'Mật khẩu phải có ít nhất 8 ký tự',
           },
         ]"
       >
         <a-input-password
           v-model:value="form.password"
-          placeholder="Password"
+          placeholder="Mật khẩu"
           size="large"
         >
           <template #prefix><LockOutlined /></template>
@@ -86,11 +86,11 @@ const onSubmit = async () => {
 
       <a-form-item
         name="password_confirmation"
-        :rules="[{ required: true, message: 'Please confirm your password' }]"
+        :rules="[{ required: true, message: 'Vui lòng xác nhận mật khẩu' }]"
       >
         <a-input-password
           v-model:value="form.password_confirmation"
-          placeholder="Confirm Password"
+          placeholder="Xác nhận mật khẩu"
           size="large"
         >
           <template #prefix><LockOutlined /></template>
@@ -105,14 +105,14 @@ const onSubmit = async () => {
           block
           :loading="auth.loading"
         >
-          Create Account
+          Tạo tài khoản
         </a-button>
       </a-form-item>
     </a-form>
 
     <div class="text-center text-slate-500">
-      Already have an account?
-      <router-link to="/login" class="text-blue-500">Sign in</router-link>
+      Đã có tài khoản?
+      <router-link to="/login" class="text-blue-500">Đăng nhập</router-link>
     </div>
   </div>
 </template>

@@ -26,8 +26,8 @@ class TransactionController extends Controller
     {
         $transactions = $this->transactionService->getTransactions(
             $request->user()->id,
-            $request->only(['wallet_id', 'category_id', 'type', 'start_date', 'end_date']),
-            $request->input('per_page', 15)
+            $request->only(['wallet_id', 'category_id', 'type', 'start_date', 'end_date', 'search', 'sort_by', 'sort_order']),
+            $request->input('per_page', 10)
         );
 
         return response()->json([
@@ -48,17 +48,6 @@ class TransactionController extends Controller
      */
     public function store(TransactionRequest $request): JsonResponse
     {
-        // Need to check if wallet belongs to user?
-        // WalletRequest/Rule logic or Service logic?
-        // Service updates balance, so we must be sure wallet is user's.
-        // Validation rule `exists:wallets,id` just checks existence.
-        // We should add ownership check.
-        // Best place: Request validations with `Rule::exists('wallets')->where('user_id', $this->user()->id)`
-        // Or in service.
-
-        // I'll trust the Service to fail or I should ensure the wallet is owned by user in Request.
-        // For now, I'll pass user ID to service and service will look it up.
-
         $transaction = $this->transactionService->createTransaction(
             $request->user()->id,
             $request->validated()

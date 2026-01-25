@@ -11,12 +11,14 @@ class SavingsGoalSeeder extends Seeder
     public function run(): void
     {
         $user = User::where('email', 'klpod221@gmail.com')->first();
-        if (!$user) return;
+        if (!$user) {
+            return;
+        }
 
         $goals = [
             [
                 'name' => 'MacBook Pro M4',
-                'description' => 'For coding and video editing',
+                'description' => 'Để lập trình và chỉnh sửa video',
                 'target_amount' => 50000000,
                 'current_amount' => 15000000,
                 'currency' => 'VND',
@@ -27,8 +29,8 @@ class SavingsGoalSeeder extends Seeder
                 'color' => '#8b5cf6',
             ],
             [
-                'name' => 'Japan Trip',
-                'description' => 'Cherry blossom season',
+                'name' => 'Du lịch Nhật Bản',
+                'description' => 'Mùa hoa anh đào',
                 'target_amount' => 45000000,
                 'current_amount' => 5000000,
                 'currency' => 'VND',
@@ -39,8 +41,8 @@ class SavingsGoalSeeder extends Seeder
                 'color' => '#ec4899',
             ],
             [
-                'name' => 'Emergency Fund',
-                'description' => '3 months of expenses',
+                'name' => 'Quỹ khẩn cấp',
+                'description' => '3 tháng chi phí sinh hoạt',
                 'target_amount' => 60000000,
                 'current_amount' => 60000000,
                 'currency' => 'VND',

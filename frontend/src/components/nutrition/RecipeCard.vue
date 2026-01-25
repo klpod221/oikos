@@ -14,41 +14,41 @@ defineEmits(["edit", "delete"]);
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow"
+    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow"
   >
-    <div class="flex items-start justify-between mb-3">
+    <div class="flex items-start justify-between mb-2 sm:mb-3">
       <div
-        class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center"
+        class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-100 flex items-center justify-center"
       >
-        <CoffeeOutlined class="text-green-600 text-xl" />
+        <CoffeeOutlined class="text-green-600 text-lg sm:text-xl" />
       </div>
       <a-dropdown>
         <a-button type="text" size="small">•••</a-button>
         <template #overlay>
           <a-menu>
             <a-menu-item @click="$emit('edit', recipe)">
-              <EditOutlined class="mr-2" /> Edit
+              <EditOutlined class="mr-2" /> Sửa
             </a-menu-item>
             <a-menu-item class="text-red-500!">
               <a-popconfirm
-                title="Delete this recipe?"
+                title="Xóa công thức này?"
                 @confirm="$emit('delete', recipe.id)"
               >
-                <DeleteOutlined class="mr-2" /> Delete
+                <DeleteOutlined class="mr-2" /> Xóa
               </a-popconfirm>
             </a-menu-item>
           </a-menu>
         </template>
       </a-dropdown>
     </div>
-    <h3 class="font-semibold text-slate-800">{{ recipe.name }}</h3>
-    <p class="text-sm text-slate-500 mb-3 line-clamp-2">
-      {{ recipe.description || "No description" }}
+    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">{{ recipe.name }}</h3>
+    <p class="text-xs sm:text-sm text-slate-500 mb-2 sm:mb-3 line-clamp-2">
+      {{ recipe.description || "Không có mô tả" }}
     </p>
-    <div class="flex gap-4 text-sm text-slate-500">
-      <span>{{ recipe.servings }} servings</span>
+    <div class="flex gap-2 text-xs sm:text-sm text-slate-500">
+      <span>{{ recipe.servings }} khẩu phần</span>
       <span
-        >{{ (recipe.prep_time || 0) + (recipe.cooking_time || 0) }} mins</span
+        >{{ (recipe.prep_time || 0) + (recipe.cooking_time || 0) }} phút</span
       >
     </div>
     <div v-if="recipe.calories" class="mt-2 text-xs text-slate-400">

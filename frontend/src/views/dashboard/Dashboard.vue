@@ -1,209 +1,148 @@
 <script setup>
-import { onMounted, computed } from "vue";
-import { useFinanceStore } from "../../stores/finance";
+import { onMounted } from "vue";
+import { useDashboardStore } from "../../stores/dashboard";
 import { useAuthStore } from "../../stores/auth";
-import {
-  WalletOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  PlusOutlined,
-  RightOutlined,
-} from "@ant-design/icons-vue";
-import { useRouter } from "vue-router";
+import { ReloadOutlined } from "@ant-design/icons-vue";
 
-const router = useRouter();
-const finance = useFinanceStore();
+// Components
+import StatsSummary from "../../components/dashboard/StatsSummary.vue";
+import PeriodSelector from "../../components/dashboard/PeriodSelector.vue";
+import IncomeExpenseChart from "../../components/dashboard/IncomeExpenseChart.vue";
+import CategoryPieChart from "../../components/dashboard/CategoryPieChart.vue";
+import TopExpensesTable from "../../components/dashboard/TopExpensesTable.vue";
+import ExternalDataWidget from "../../components/dashboard/ExternalDataWidget.vue";
+
+const dashboard = useDashboardStore();
 const auth = useAuthStore();
 
 onMounted(async () => {
-  await Promise.all([
-    finance.fetchWallets(),
-    finance.fetchTransactions({ limit: 5 }),
-  ]);
+  await dashboard.fetchStatistics();
   auth.fetchUser();
 });
 
-// Calculate monthly stats (placeholder - would need date filtering from API)
-const monthlyIncome = computed(() => {
-  return finance.transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-});
+const handlePeriodChange = async (period) => {
+  await dashboard.setPeriod(period);
+};
 
-const monthlyExpense = computed(() => {
-  return finance.transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + Number(t.amount), 0);
-});
+const handleCustomRange = async (start, end) => {
+  await dashboard.setCustomRange(start, end);
+};
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-3 sm:space-y-4">
     <!-- Header -->
     <div
-      class="flex flex-col sm:flex-row justify-between sm:items-center gap-4"
+      class="flex flex-col sm:flex-row justify-between sm:items-center gap-2"
     >
       <div>
-        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <p class="text-slate-500">Welcome back, {{ auth.user?.name }}</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
+          Chào mừng trở lại, {{ auth.user?.name }}
+        </h1>
       </div>
-      <a-button type="primary" @click="router.push('/finance')">
-        <template #icon><PlusOutlined /></template>
-        New Transaction
+      <a-button
+        @click="dashboard.refreshStatistics"
+        :loading="dashboard.loading"
+        size="middle"
+      >
+        <template #icon><ReloadOutlined /></template>
+        <span class="hidden sm:inline">Làm mới</span>
       </a-button>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Total Balance -->
-      <div
-        class="bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-blue-100">Total Balance</span>
-          <WalletOutlined class="text-2xl opacity-80" />
-        </div>
-        <div class="text-3xl font-bold">
-          ${{ finance.totalBalance.toFixed(2) }}
-        </div>
-        <div class="text-blue-200 text-sm mt-2">
-          {{ finance.wallets.length }} wallet(s)
-        </div>
-      </div>
+    <!-- Period Selector -->
+    <PeriodSelector
+      :period="dashboard.selectedPeriod"
+      @update:period="handlePeriodChange"
+      @customRange="handleCustomRange"
+    />
 
-      <!-- Income -->
-      <div class="bg-white border border-slate-200 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-slate-500">Income</span>
-          <div
-            class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"
-          >
-            <ArrowUpOutlined class="text-green-600" />
-          </div>
-        </div>
-        <div class="text-2xl font-bold text-slate-800">
-          ${{ monthlyIncome.toFixed(2) }}
-        </div>
-        <div class="text-green-600 text-sm mt-2">This period</div>
-      </div>
+    <!-- External Data Widget (Weather, Rates, Metals) -->
+    <ExternalDataWidget />
 
-      <!-- Expenses -->
-      <div class="bg-white border border-slate-200 rounded-xl p-6">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-slate-500">Expenses</span>
-          <div
-            class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center"
-          >
-            <ArrowDownOutlined class="text-red-600" />
-          </div>
-        </div>
-        <div class="text-2xl font-bold text-slate-800">
-          ${{ monthlyExpense.toFixed(2) }}
-        </div>
-        <div class="text-red-600 text-sm mt-2">This period</div>
-      </div>
+    <!-- Loading State -->
+    <div
+      v-if="dashboard.loading && !dashboard.statistics"
+      class="flex items-center justify-center py-20"
+    >
+      <a-spin size="large" />
     </div>
 
-    <!-- Wallets Overview -->
-    <div class="bg-white border border-slate-200 rounded-xl">
-      <div
-        class="p-4 border-b border-slate-200 flex justify-between items-center"
-      >
-        <h2 class="font-semibold text-slate-800">My Wallets</h2>
-        <a-button type="link" @click="router.push('/finance')">
-          View All <RightOutlined />
-        </a-button>
+    <!-- Custom Period - Waiting for date selection -->
+    <div
+      v-else-if="
+        dashboard.selectedPeriod === 'custom' && !dashboard.customRange.start
+      "
+      class="bg-white border border-slate-200 rounded-xl p-12 text-center"
+    >
+      <p class="text-slate-500">
+        Vui lòng chọn khoảng thời gian để xem thống kê
+      </p>
+    </div>
+
+    <!-- Statistics Content -->
+    <template v-else-if="dashboard.statistics">
+      <!-- Summary Cards -->
+      <StatsSummary :summary="dashboard.statistics.summary" />
+
+      <!-- Charts Row 1 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <IncomeExpenseChart :daily-trend="dashboard.statistics.daily_trend" />
+        <CategoryPieChart :by-category="dashboard.statistics.by_category" />
       </div>
-      <div class="p-4">
-        <div
-          v-if="finance.wallets.length === 0"
-          class="text-center py-8 text-slate-400"
-        >
-          No wallets yet
-        </div>
-        <div
-          v-else
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-        >
-          <div
-            v-for="wallet in finance.wallets.slice(0, 3)"
-            :key="wallet.id"
-            class="p-4 bg-slate-50 rounded-lg"
+
+      <!-- Charts Row 2 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <TopExpensesTable :top-expenses="dashboard.statistics.top_expenses" />
+
+        <!-- Savings Goals Progress -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+          <h3
+            class="text-base lg:text-lg font-semibold text-slate-800 mb-2 lg:mb-4"
           >
-            <div class="flex items-center gap-3">
+            Tiến độ mục tiêu tiết kiệm
+          </h3>
+          <div class="space-y-3">
+            <div
+              v-for="goal in dashboard.statistics.savings_goals_progress"
+              :key="goal.goal_id"
+              class="p-3 bg-slate-50 rounded-lg"
+            >
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-medium text-slate-800">{{ goal.name }}</span>
+                <span class="text-sm text-slate-500"
+                  >{{ goal.current_progress }}%</span
+                >
+              </div>
+              <a-progress
+                :percent="goal.current_progress"
+                :show-info="false"
+                stroke-color="#10b981"
+              />
               <div
-                class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center"
+                v-if="goal.monthly_required > 0"
+                class="text-xs text-slate-500 mt-1"
               >
-                <WalletOutlined class="text-blue-600" />
+                Cần {{ goal.monthly_required.toLocaleString() }}₫/tháng
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="font-medium text-slate-800 truncate">
-                  {{ wallet.name }}
-                </div>
-                <div class="text-lg font-bold text-slate-800">
-                  ${{ Number(wallet.balance).toFixed(2) }}
-                </div>
-              </div>
+            </div>
+            <div
+              v-if="dashboard.statistics.savings_goals_progress.length === 0"
+              class="text-center py-8 text-slate-400"
+            >
+              Không có mục tiêu tiết kiệm nào đang hoạt động
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
 
-    <!-- Recent Transactions -->
-    <div class="bg-white border border-slate-200 rounded-xl">
-      <div
-        class="p-4 border-b border-slate-200 flex justify-between items-center"
-      >
-        <h2 class="font-semibold text-slate-800">Recent Transactions</h2>
-        <a-button type="link" @click="router.push('/finance')">
-          View All <RightOutlined />
-        </a-button>
-      </div>
-      <a-list
-        :data-source="finance.transactions.slice(0, 5)"
-        :loading="finance.loading"
-        :locale="{ emptyText: 'No transactions yet' }"
-      >
-        <template #renderItem="{ item }">
-          <a-list-item class="px-4!">
-            <a-list-item-meta>
-              <template #avatar>
-                <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold"
-                  :class="
-                    item.type === 'income'
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-red-100 text-red-600'
-                  "
-                >
-                  <ArrowUpOutlined v-if="item.type === 'income'" />
-                  <ArrowDownOutlined v-else />
-                </div>
-              </template>
-              <template #title>{{
-                item.description || "Transaction"
-              }}</template>
-              <template #description
-                >{{ item.category?.name || "Uncategorized" }} •
-                {{ item.transaction_date }}</template
-              >
-            </a-list-item-meta>
-            <template #actions>
-              <span
-                class="font-semibold"
-                :class="
-                  item.type === 'income' ? 'text-green-600' : 'text-red-600'
-                "
-              >
-                {{ item.type === "income" ? "+" : "-" }}${{
-                  Number(item.amount).toFixed(2)
-                }}
-              </span>
-            </template>
-          </a-list-item>
-        </template>
-      </a-list>
+    <!-- Empty State -->
+    <div
+      v-else
+      class="bg-white border border-slate-200 rounded-xl p-12 text-center"
+    >
+      <p class="text-slate-400">Không có dữ liệu</p>
     </div>
   </div>
 </template>

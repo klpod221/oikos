@@ -22,7 +22,7 @@ class CategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $categories = $this->categoryService->getCategories(
-            $request->only(['search', 'type']),
+            $request->only(['search', 'type', 'sort_by', 'sort_order']),
             $request->input('per_page', 15)
         );
 

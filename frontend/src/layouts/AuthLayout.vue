@@ -1,3 +1,7 @@
+<script setup>
+import { HeartFilled } from "@ant-design/icons-vue";
+</script>
+
 <template>
   <div class="min-h-screen flex">
     <!-- Left Side - Branding (Desktop only) -->
@@ -13,17 +17,18 @@
 
       <div class="text-white space-y-6">
         <h1 class="text-4xl font-bold leading-tight">
-          Manage your life,<br />
-          all in one place.
+          Quản lý cuộc sống,<br />
+          tất cả trong một.
         </h1>
         <p class="text-blue-100 text-lg max-w-md">
-          Track your finances, plan your meals, and achieve your goals with
-          OikOS - your personal life management companion.
+          Theo dõi tài chính, lên kế hoạch ăn uống và đạt được mục tiêu cùng
+          OikOS - người bạn đồng hành quản lý cuộc sống cá nhân của bạn.
         </p>
       </div>
 
       <div class="text-blue-200 text-sm">
-        © 2026 OikOS. All rights reserved.
+        Made with <HeartFilled class="text-red-500!" /> by
+        <a href="https://github.com/klpod221" target="_blank">klpod221</a>
       </div>
     </div>
 

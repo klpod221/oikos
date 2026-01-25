@@ -4,18 +4,54 @@ import { nutritionService } from "../services/nutrition.service";
 import { message } from "ant-design-vue";
 
 export const useNutritionStore = defineStore("nutrition", () => {
-  // State
+  // Ingredient State
   const ingredients = ref([]);
+  const ingredientFilters = ref({
+    search: "",
+    sort_by: "",
+    sort_order: "desc",
+  });
+  const ingredientPagination = ref({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 15,
+    total: 0,
+  });
+
+  // Recipe State
   const recipes = ref([]);
-  const mealPlans = ref([]);
+  const recipeFilters = ref({
+    search: "",
+    sort_by: "",
+    sort_order: "desc",
+  });
+  const recipePagination = ref({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 15,
+    total: 0,
+  });
+
   const loading = ref(false);
 
   // Ingredients Actions
-  const fetchIngredients = async (params = {}) => {
+  const fetchIngredients = async (page = 1) => {
     loading.value = true;
     try {
-      const res = await nutritionService.getIngredients(params);
+      const res = await nutritionService.getIngredients(
+        ingredientFilters.value,
+        page,
+        ingredientPagination.value.perPage
+      );
       ingredients.value = res.data.data || [];
+      if (res.data.meta) {
+        ingredientPagination.value = {
+          currentPage: res.data.meta.current_page,
+          lastPage: res.data.meta.last_page,
+          perPage: res.data.meta.per_page || 15,
+          total: res.data.meta.total,
+        };
+      }
     } catch (e) {
       console.error("Failed to fetch ingredients", e);
     } finally {
@@ -27,7 +63,7 @@ export const useNutritionStore = defineStore("nutrition", () => {
     try {
       await nutritionService.createIngredient(data);
       message.success("Ingredient added");
-      await fetchIngredients();
+      await fetchIngredients(ingredientPagination.value.currentPage);
       return true;
     } catch (e) {
       message.error(e.response?.data?.message || "Failed to add ingredient");
@@ -36,11 +72,23 @@ export const useNutritionStore = defineStore("nutrition", () => {
   };
 
   // Recipes Actions
-  const fetchRecipes = async (params = {}) => {
+  const fetchRecipes = async (page = 1) => {
     loading.value = true;
     try {
-      const res = await nutritionService.getRecipes(params);
+      const res = await nutritionService.getRecipes(
+        recipeFilters.value,
+        page,
+        recipePagination.value.perPage
+      );
       recipes.value = res.data.data || [];
+      if (res.data.meta) {
+        recipePagination.value = {
+          currentPage: res.data.meta.current_page,
+          lastPage: res.data.meta.last_page,
+          perPage: res.data.meta.per_page || 15,
+          total: res.data.meta.total,
+        };
+      }
     } catch (e) {
       console.error("Failed to fetch recipes", e);
     } finally {
@@ -52,7 +100,7 @@ export const useNutritionStore = defineStore("nutrition", () => {
     try {
       await nutritionService.createRecipe(data);
       message.success("Recipe created");
-      await fetchRecipes();
+      await fetchRecipes(recipePagination.value.currentPage);
       return true;
     } catch (e) {
       message.error(e.response?.data?.message || "Failed to create recipe");
@@ -64,7 +112,7 @@ export const useNutritionStore = defineStore("nutrition", () => {
     try {
       await nutritionService.deleteRecipe(id);
       message.success("Recipe deleted");
-      await fetchRecipes();
+      await fetchRecipes(recipePagination.value.currentPage);
       return true;
     } catch (e) {
       message.error(e.response?.data?.message || "Failed to delete recipe");
@@ -72,24 +120,16 @@ export const useNutritionStore = defineStore("nutrition", () => {
     }
   };
 
-  // Meal Plans Actions
-  const fetchMealPlans = async (params = {}) => {
-    loading.value = true;
-    try {
-      const res = await nutritionService.getMealPlans(params);
-      mealPlans.value = res.data.data || [];
-    } catch (e) {
-      console.error("Failed to fetch meal plans", e);
-    } finally {
-      loading.value = false;
-    }
-  };
-
   return {
-    // State
+    // Ingredient State
     ingredients,
+    ingredientFilters,
+    ingredientPagination,
+    // Recipe State
     recipes,
-    mealPlans,
+    recipeFilters,
+    recipePagination,
+    // Common
     loading,
     // Actions
     fetchIngredients,
@@ -97,6 +137,5 @@ export const useNutritionStore = defineStore("nutrition", () => {
     fetchRecipes,
     createRecipe,
     deleteRecipe,
-    fetchMealPlans,
   };
 });

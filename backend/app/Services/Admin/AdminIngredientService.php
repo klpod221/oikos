@@ -13,10 +13,7 @@ class AdminIngredientService
     public function getIngredients(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Ingredient::global()
-            ->when(isset($filters['search']), function ($query, $search) {
-                $query->where('name', 'ilike', "%{$search}%");
-            })
-            ->orderBy('name')
+            ->applyFilters($filters)
             ->paginate($perPage);
     }
 

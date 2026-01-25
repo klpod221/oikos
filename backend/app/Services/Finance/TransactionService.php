@@ -7,6 +7,7 @@ use App\Models\Wallet;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use App\Services\Finance\StatisticsService;
 
 class TransactionService
 {
@@ -17,23 +18,7 @@ class TransactionService
     {
         return Transaction::where('user_id', $userId)
             ->with(['category', 'wallet'])
-            ->when(isset($filters['wallet_id']), function ($query, $walletId) {
-                $query->where('wallet_id', $walletId);
-            })
-            ->when(isset($filters['category_id']), function ($query, $catId) {
-                $query->where('category_id', $catId);
-            })
-            ->when(isset($filters['type']), function ($query, $type) {
-                $query->where('type', $type);
-            })
-            ->when(isset($filters['start_date']), function ($query, $date) {
-                $query->whereDate('transaction_date', '>=', $date);
-            })
-            ->when(isset($filters['end_date']), function ($query, $date) {
-                $query->whereDate('transaction_date', '<=', $date);
-            })
-            ->orderBy('transaction_date', 'desc')
-            ->orderBy('created_at', 'desc')
+            ->applyFilters($filters)
             ->paginate($perPage);
     }
 
@@ -55,6 +40,9 @@ class TransactionService
             } else {
                 $wallet->subtractBalance((float) $transaction->amount);
             }
+
+            // Invalidate statistics cache
+            app(StatisticsService::class)->invalidateCache($userId);
 
             return $transaction;
         });
@@ -90,6 +78,9 @@ class TransactionService
                 $newWallet->subtractBalance((float) $transaction->amount);
             }
 
+            // Invalidate statistics cache
+            app(StatisticsService::class)->invalidateCache($transaction->user_id);
+
             return $transaction;
         });
     }
@@ -110,6 +101,9 @@ class TransactionService
             }
 
             $transaction->delete();
+
+            // Invalidate statistics cache
+            app(StatisticsService::class)->invalidateCache($transaction->user_id);
         });
     }
 }

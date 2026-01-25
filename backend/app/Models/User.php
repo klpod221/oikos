@@ -12,6 +12,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasApiTokens, Notifiable;
+    use \App\Traits\Filterable;
 
     /**
      * Role constants for RBAC
@@ -34,9 +35,41 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar',
         'password',
         'role',
         'status',
+    ];
+
+    /**
+     * Fields that can be filtered
+     *
+     * @var array
+     */
+    public $filterable = [
+        'role',
+        'status',
+    ];
+
+    /**
+     * Fields that can be sorted
+     *
+     * @var array
+     */
+    public $sortable = [
+        'created_at',
+        'name',
+        'email',
+    ];
+
+    /**
+     * Fields that can be searched
+     *
+     * @var array
+     */
+    public $searchable = [
+        'name',
+        'email',
     ];
 
     /**
@@ -128,5 +161,13 @@ class User extends Authenticatable
     public function savingsGoals(): HasMany
     {
         return $this->hasMany(SavingsGoal::class);
+    }
+
+    /**
+     * User has one settings configuration
+     */
+    public function settings(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserSetting::class);
     }
 }

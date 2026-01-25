@@ -13,18 +13,22 @@ class TransactionSeeder extends Seeder
     public function run(): void
     {
         $user = User::where('email', 'klpod221@gmail.com')->first();
-        if (!$user) return;
+        if (!$user) {
+            return;
+        }
 
-        $cash = Wallet::where('user_id', $user->id)->where('name', 'Cash')->first();
+        $cash = Wallet::where('user_id', $user->id)->where('name', 'Tiền mặt')->first();
         $bank = Wallet::where('user_id', $user->id)->where('name', 'Vietcombank')->first();
 
         // Get some categories
-        $food = Category::where('name', 'Food & Dining')->first();
-        $transport = Category::where('name', 'Transportation')->first();
-        $salary = Category::where('name', 'Salary')->first();
-        $shopping = Category::where('name', 'Shopping')->first();
+        $food = Category::where('name', 'Ăn uống')->first();
+        $transport = Category::where('name', 'Di chuyển')->first();
+        $salary = Category::where('name', 'Lương')->first();
+        $shopping = Category::where('name', 'Mua sắm')->first();
 
-        if (!$cash || !$bank) return;
+        if (!$cash || !$bank) {
+            return;
+        }
 
         $transactions = [
             [
@@ -32,7 +36,7 @@ class TransactionSeeder extends Seeder
                 'category_id' => $salary->id ?? null,
                 'type' => 'income',
                 'amount' => 30000000,
-                'description' => 'Monthly Salary',
+                'description' => 'Lương tháng',
                 'transaction_date' => now()->startOfMonth()->addDays(5)->toDateString(),
             ],
             [
@@ -40,7 +44,7 @@ class TransactionSeeder extends Seeder
                 'category_id' => $food->id ?? null,
                 'type' => 'expense',
                 'amount' => 50000,
-                'description' => 'Lunch at Pho 24',
+                'description' => 'Ăn trưa tại Phở 24',
                 'transaction_date' => now()->subDays(1)->toDateString(),
             ],
             [
@@ -48,7 +52,7 @@ class TransactionSeeder extends Seeder
                 'category_id' => $transport->id ?? null,
                 'type' => 'expense',
                 'amount' => 30000,
-                'description' => 'Grab bike to work',
+                'description' => 'GrabBike đi làm',
                 'transaction_date' => now()->subDays(2)->toDateString(),
             ],
             [
@@ -56,7 +60,7 @@ class TransactionSeeder extends Seeder
                 'category_id' => $shopping->id ?? null,
                 'type' => 'expense',
                 'amount' => 500000,
-                'description' => 'New T-shirt',
+                'description' => 'Áo thun mới',
                 'transaction_date' => now()->subDays(3)->toDateString(),
             ],
             [
@@ -64,18 +68,13 @@ class TransactionSeeder extends Seeder
                 'category_id' => $food->id ?? null,
                 'type' => 'expense',
                 'amount' => 1500000,
-                'description' => 'Supermarket Grocery',
+                'description' => 'Mua sắm siêu thị',
                 'transaction_date' => now()->subWeek()->toDateString(),
             ],
         ];
 
         foreach ($transactions as $data) {
             Transaction::create(array_merge($data, ['user_id' => $user->id]));
-
-            // Note: In real app, we should update wallet balance here too,
-            // but since we hardcoded initial balance in WalletSeeder, we can skip or adding properly.
-            // For seeding demo data, hardcoded wallet balance + transactions might cause discrepancy if unchecked.
-            // But let's just seed transactions for viewing.
         }
     }
 }

@@ -12,10 +12,10 @@ const form = reactive({ email: "", password: "" });
 
 const onSubmit = async () => {
   if (await auth.login(form)) {
-    message.success("Welcome back!");
+    message.success("Chào mừng trở lại!");
     router.push("/");
   } else {
-    message.error(auth.error || "Login failed");
+    message.error(auth.error || "Đăng nhập thất bại");
   }
 };
 </script>
@@ -23,8 +23,8 @@ const onSubmit = async () => {
 <template>
   <div>
     <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold text-slate-800">Welcome Back</h1>
-      <p class="text-slate-500 mt-1">Sign in to your account</p>
+      <h1 class="text-2xl font-bold text-slate-800">Chào mừng trở lại</h1>
+      <p class="text-slate-500 mt-1">Đăng nhập vào tài khoản của bạn</p>
     </div>
 
     <a-form :model="form" @finish="onSubmit" layout="vertical">
@@ -34,7 +34,7 @@ const onSubmit = async () => {
           {
             required: true,
             type: 'email',
-            message: 'Please enter a valid email',
+            message: 'Vui lòng nhập email hợp lệ',
           },
         ]"
       >
@@ -45,11 +45,11 @@ const onSubmit = async () => {
 
       <a-form-item
         name="password"
-        :rules="[{ required: true, message: 'Please enter your password' }]"
+        :rules="[{ required: true, message: 'Vui lòng nhập mật khẩu' }]"
       >
         <a-input-password
           v-model:value="form.password"
-          placeholder="Password"
+          placeholder="Mật khẩu"
           size="large"
         >
           <template #prefix><LockOutlined /></template>
@@ -64,14 +64,14 @@ const onSubmit = async () => {
           block
           :loading="auth.loading"
         >
-          Sign In
+          Đăng nhập
         </a-button>
       </a-form-item>
     </a-form>
 
     <div class="text-center text-slate-500">
-      Don't have an account?
-      <router-link to="/register" class="text-blue-500">Sign up</router-link>
+      Chưa có tài khoản?
+      <router-link to="/register" class="text-blue-500">Đăng ký</router-link>
     </div>
   </div>
 </template>

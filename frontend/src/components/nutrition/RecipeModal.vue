@@ -31,42 +31,42 @@ const handleOk = () => {
 <template>
   <a-modal
     :open="open"
-    :title="recipe ? 'Edit Recipe' : 'New Recipe'"
+    :title="recipe ? 'Chỉnh sửa công thức' : 'Tạo công thức mới'"
     @update:open="emit('update:open', $event)"
     @ok="handleOk"
     :confirm-loading="loading"
     width="600px"
   >
     <a-form :model="form" layout="vertical" class="mt-4">
-      <a-form-item label="Recipe Name" required>
+      <a-form-item label="Tên công thức" required>
         <a-input
           v-model:value="form.name"
-          placeholder="e.g., Grilled Chicken Salad"
+          placeholder="Ví dụ: Salad ức gà nướng"
         />
       </a-form-item>
-      <a-form-item label="Description">
+      <a-form-item label="Mô tả">
         <a-textarea
           v-model:value="form.description"
-          placeholder="Brief description"
+          placeholder="Mô tả ngắn gọn"
           :rows="2"
         />
       </a-form-item>
-      <div class="grid grid-cols-3 gap-4">
-        <a-form-item label="Servings">
+      <div class="grid grid-cols-3 gap-2">
+        <a-form-item label="Khẩu phần">
           <a-input-number
             v-model:value="form.servings"
             :min="1"
             class="w-full!"
           />
         </a-form-item>
-        <a-form-item label="Prep Time (mins)">
+        <a-form-item label="Chuẩn bị (phút)">
           <a-input-number
             v-model:value="form.prep_time"
             :min="0"
             class="w-full!"
           />
         </a-form-item>
-        <a-form-item label="Cook Time (mins)">
+        <a-form-item label="Nấu (phút)">
           <a-input-number
             v-model:value="form.cooking_time"
             :min="0"
@@ -74,33 +74,33 @@ const handleOk = () => {
           />
         </a-form-item>
       </div>
-      <a-form-item label="Instructions">
+      <a-form-item label="Hướng dẫn">
         <a-textarea
           v-model:value="form.instructions"
-          placeholder="Step by step instructions..."
+          placeholder="Hướng dẫn từng bước..."
           :rows="4"
         />
       </a-form-item>
-      <a-divider>Nutrition Info (per serving)</a-divider>
-      <div class="grid grid-cols-4 gap-4">
-        <a-form-item label="Calories">
+      <a-divider>Thông tin dinh dưỡng (mỗi khẩu phần)</a-divider>
+      <div class="grid grid-cols-4 gap-2">
+        <a-form-item label="Calo">
           <a-input-number
             v-model:value="form.calories"
             :min="0"
             class="w-full!"
           />
         </a-form-item>
-        <a-form-item label="Protein (g)">
+        <a-form-item label="Đạm (g)">
           <a-input-number
             v-model:value="form.protein"
             :min="0"
             class="w-full!"
           />
         </a-form-item>
-        <a-form-item label="Carbs (g)">
+        <a-form-item label="Tinh bột (g)">
           <a-input-number v-model:value="form.carbs" :min="0" class="w-full!" />
         </a-form-item>
-        <a-form-item label="Fat (g)">
+        <a-form-item label="Béo (g)">
           <a-input-number v-model:value="form.fat" :min="0" class="w-full!" />
         </a-form-item>
       </div>

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Recipe extends Model
 {
     use HasFactory;
+    use \App\Traits\Filterable;
 
     protected $fillable = [
         'user_id',
@@ -25,6 +26,21 @@ class Recipe extends Model
         'carbs',
         'fat',
     ];
+
+    /**
+     * Fields that can be filtered
+     */
+    public $filterable = [];
+
+    /**
+     * Fields that can be sorted
+     */
+    public $sortable = ['name', 'prep_time', 'cooking_time', 'created_at'];
+
+    /**
+     * Fields that can be searched
+     */
+    public $searchable = ['name', 'description'];
 
     protected $casts = [
         'prep_time' => 'integer',

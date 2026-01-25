@@ -11,13 +11,15 @@ class RecipeSeeder extends Seeder
     public function run(): void
     {
         $user = User::where('email', 'klpod221@gmail.com')->first();
-        if (!$user) return;
+        if (!$user) {
+            return;
+        }
 
         $recipes = [
             [
-                'name' => 'Grilled Chicken Salad',
-                'description' => 'Healthy and packed with protein.',
-                'instructions' => "1. Season chicken breast with salt, pepper, and herbs.\n2. Grill for 6-7 mins per side.\n3. Chop lettuce, tomatoes, cucumbers.\n4. Slice chicken and serve over salad with olive oil dressing.",
+                'name' => 'Salad ức gà nướng',
+                'description' => 'Lành mạnh và giàu protein.',
+                'instructions' => "1. Ướp ức gà với muối, tiêu và thảo mộc.\n2. Nướng 6-7 phút mỗi mặt.\n3. Cắt nhỏ xà lách, cà chua, dưa chuột.\n4. Thái thịt gà và trộn cùng salad với sốt dầu ô liu.",
                 'prep_time' => 15,
                 'cooking_time' => 15,
                 'servings' => 2,
@@ -27,9 +29,9 @@ class RecipeSeeder extends Seeder
                 'fat' => 15,
             ],
             [
-                'name' => 'Oatmeal with Banana',
-                'description' => 'Perfect breakfast for energy.',
-                'instructions' => "1. Cook oats with milk or water.\n2. Slice banana.\n3. Top oatmeal with banana and honey.",
+                'name' => 'Yến mạch chuối',
+                'description' => 'Bữa sáng hoàn hảo đầy năng lượng.',
+                'instructions' => "1. Nấu yến mạch với sữa hoặc nước.\n2. Cắt lát chuối.\n3. Cho chuối và mật ong lên trên yến mạch.",
                 'prep_time' => 5,
                 'cooking_time' => 10,
                 'servings' => 1,
@@ -39,9 +41,9 @@ class RecipeSeeder extends Seeder
                 'fat' => 10,
             ],
             [
-                'name' => 'Salmon & Broccoli',
-                'description' => 'Simple and nutritious dinner.',
-                'instructions' => "1. Season salmon.\n2. Steam broccoli.\n3. Pan sear salmon skin-down until crispy.\n4. Serve together.",
+                'name' => 'Cá hồi & Bông cải xanh',
+                'description' => 'Bữa tối đơn giản và bổ dưỡng.',
+                'instructions' => "1. Ướp cá hồi.\n2. Hấp bông cải xanh.\n3. Áp chảo cá hồi mặt da xuống cho đến khi giòn.\n4. Dùng kèm với nhau.",
                 'prep_time' => 10,
                 'cooking_time' => 15,
                 'servings' => 2,

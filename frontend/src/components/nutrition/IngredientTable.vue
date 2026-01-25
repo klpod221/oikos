@@ -6,38 +6,92 @@ defineProps({
   loading: { type: Boolean, default: false },
 });
 
-defineEmits(["delete"]);
+const emit = defineEmits(["delete", "change"]);
+
+const columns = [
+  {
+    title: "Tên",
+    dataIndex: "name",
+    key: "name",
+    sorter: true,
+  },
+  {
+    title: "Đơn vị",
+    dataIndex: "unit",
+    key: "unit",
+    width: 80,
+  },
+  {
+    title: "Calo",
+    dataIndex: "calories",
+    key: "calories",
+    width: 100,
+    sorter: true,
+  },
+  {
+    title: "Đạm",
+    dataIndex: "protein",
+    key: "protein",
+    width: 80,
+    sorter: true,
+  },
+  {
+    title: "Tinh bột",
+    dataIndex: "carbs",
+    key: "carbs",
+    width: 80,
+    sorter: true,
+  },
+  {
+    title: "Béo",
+    dataIndex: "fat",
+    key: "fat",
+    width: 80,
+    sorter: true,
+  },
+  {
+    title: "",
+    key: "actions",
+    width: 60,
+  },
+];
+
+const handleTableChange = (pagination, filters, sorter) => {
+  emit("change", pagination, filters, sorter);
+};
 </script>
 
 <template>
   <a-table
+    :columns="columns"
     :data-source="ingredients"
     :loading="loading"
-    :pagination="{ pageSize: 10 }"
+    :pagination="false"
     row-key="id"
+    @change="handleTableChange"
+    :scroll="{ x: 'max-content' }"
+    size="small"
   >
-    <a-table-column title="Name" data-index="name" key="name" />
-    <a-table-column title="Unit" data-index="unit" key="unit" width="80" />
-    <a-table-column title="Calories" key="calories" width="100">
-      <template #default="{ record }">{{ record.calories }} kcal</template>
-    </a-table-column>
-    <a-table-column title="Protein" key="protein" width="80">
-      <template #default="{ record }">{{ record.protein }}g</template>
-    </a-table-column>
-    <a-table-column title="Carbs" key="carbs" width="80">
-      <template #default="{ record }">{{ record.carbs }}g</template>
-    </a-table-column>
-    <a-table-column title="Fat" key="fat" width="80">
-      <template #default="{ record }">{{ record.fat }}g</template>
-    </a-table-column>
-    <a-table-column title="" key="actions" width="60">
-      <template #default="{ record }">
-        <a-popconfirm title="Delete?" @confirm="$emit('delete', record.id)">
-          <a-button type="text" danger size="small"
-            ><DeleteOutlined
-          /></a-button>
+    <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'calories'">
+        <span class="text-xs sm:text-sm">{{ record.calories }} kcal</span>
+      </template>
+      <template v-if="column.key === 'protein'">
+        <span class="text-xs sm:text-sm">{{ record.protein }}g</span>
+      </template>
+      <template v-if="column.key === 'carbs'">
+        <span class="text-xs sm:text-sm">{{ record.carbs }}g</span>
+      </template>
+      <template v-if="column.key === 'fat'">
+        <span class="text-xs sm:text-sm">{{ record.fat }}g</span>
+      </template>
+      <template v-if="column.key === 'actions'">
+        <a-popconfirm title="Xóa?" @confirm="$emit('delete', record.id)">
+          <a-button type="text" danger size="small">
+            <DeleteOutlined class="text-xs sm:text-sm" />
+          </a-button>
         </a-popconfirm>
       </template>
-    </a-table-column>
+    </template>
   </a-table>
 </template>

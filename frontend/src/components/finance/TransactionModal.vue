@@ -73,7 +73,7 @@ const handleOk = () => {
           </a-select-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="Danh mục">
+      <a-form-item label="Danh mục" required>
         <a-select
           v-model:value="form.category_id"
           placeholder="Chọn danh mục"

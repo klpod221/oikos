@@ -97,6 +97,42 @@ export const useFinanceStore = defineStore("finance", () => {
     }
   };
 
+  const createCategory = async (data) => {
+    try {
+      await financeService.createCategory(data);
+      message.success("Category created successfully");
+      await fetchCategories();
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Failed to create category");
+      return false;
+    }
+  };
+
+  const updateCategory = async (id, data) => {
+    try {
+      await financeService.updateCategory(id, data);
+      message.success("Category updated successfully");
+      await fetchCategories();
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Failed to update category");
+      return false;
+    }
+  };
+
+  const deleteCategory = async (id) => {
+    try {
+      await financeService.deleteCategory(id);
+      message.success("Category deleted successfully");
+      await fetchCategories();
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Failed to delete category");
+      return false;
+    }
+  };
+
   // Transaction Actions
   const fetchTransactions = async (params = {}) => {
     loading.value = true;
@@ -233,6 +269,9 @@ export const useFinanceStore = defineStore("finance", () => {
     updateWallet,
     deleteWallet,
     fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
     fetchTransactions,
     createTransaction,
     updateTransaction,

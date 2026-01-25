@@ -18,6 +18,9 @@ import {
   WalletOutlined,
   SwapOutlined,
   TrophyOutlined,
+  TagsOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons-vue";
 
 // Components
@@ -27,6 +30,7 @@ import TransactionTable from "../../components/finance/TransactionTable.vue";
 import TransactionModal from "../../components/finance/TransactionModal.vue";
 import SavingsGoalCard from "../../components/finance/SavingsGoalCard.vue";
 import SavingsGoalModal from "../../components/finance/SavingsGoalModal.vue";
+import CategoryModal from "../../components/finance/CategoryModal.vue";
 import { formatCurrency } from "../../utils/formatters";
 
 const finance = useFinanceStore();
@@ -36,9 +40,11 @@ const activeTab = ref("wallets");
 const walletModalOpen = ref(false);
 const transactionModalOpen = ref(false);
 const savingsGoalModalOpen = ref(false);
+const categoryModalOpen = ref(false);
 const editingWallet = ref(null);
 const editingTransaction = ref(null);
 const editingGoal = ref(null);
+const editingCategory = ref(null);
 
 // Transaction Filters
 const searchQuery = ref("");
@@ -143,6 +149,12 @@ const savingsGoalForm = ref({
   icon: "🎯",
   color: "#10b981",
 });
+const categoryForm = ref({
+  name: "",
+  type: "expense",
+  icon: "",
+  color: "#3b82f6",
+});
 
 onMounted(async () => {
   await Promise.all([
@@ -189,11 +201,16 @@ const handleWalletDelete = async (id) => {
 };
 
 // Transaction handlers
-// Transaction handlers
 const openTransactionModal = (transaction = null) => {
   editingTransaction.value = transaction;
   transactionForm.value = transaction
-    ? { ...transaction }
+    ? {
+        ...transaction,
+        wallet_id: transaction.wallet?.id,
+        category_id: transaction.category?.id,
+        // Ensure date is formatted correctly for input type="date"
+        transaction_date: transaction.transaction_date, 
+      }
     : {
         wallet_id: finance.wallets[0]?.id || null,
         category_id: null,
@@ -232,6 +249,38 @@ const handleSavingsGoalSubmit = async (data) => {
 const handleSavingsGoalDelete = async (id) => {
   await finance.deleteSavingsGoal(id);
 };
+
+// Category handlers
+const showCategoryModal = (category = null) => {
+  editingCategory.value = category;
+  categoryForm.value = category
+    ? {
+        name: category.name,
+        type: category.type,
+        icon: category.icon,
+        color: category.color,
+      }
+    : {
+        name: "",
+        type: "expense",
+        icon: "",
+        color: "#3b82f6",
+      };
+  categoryModalOpen.value = true;
+};
+
+const handleCategorySubmit = async (data) => {
+  const success = editingCategory.value
+    ? await finance.updateCategory(editingCategory.value.id, data)
+    : await finance.createCategory(data);
+  if (success) categoryModalOpen.value = false;
+};
+
+const handleCategoryDelete = async (id) => {
+  if (confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
+    await finance.deleteCategory(id);
+  }
+};
 </script>
 
 <template>
@@ -255,10 +304,15 @@ const handleSavingsGoalDelete = async (id) => {
           <span class="hidden! sm:inline!">Mục tiêu mới</span>
           <span class="ml-1 sm:hidden!">Mục tiêu</span>
         </a-button>
-        <a-button type="primary" @click="openWalletModal()" size="middle">
+        <a-button v-if="activeTab === 'wallets'" type="primary" @click="openWalletModal()" size="middle">
           <template #icon><PlusOutlined /></template>
           <span class="hidden! sm:inline!">Ví mới</span>
           <span class="ml-1 sm:hidden!">Ví</span>
+        </a-button>
+        <a-button v-if="activeTab === 'categories'" type="primary" @click="showCategoryModal()" size="middle">
+          <template #icon><PlusOutlined /></template>
+          <span class="hidden! sm:inline!">Danh mục mới</span>
+          <span class="ml-1 sm:hidden!">Danh mục</span>
         </a-button>
       </div>
     </div>
@@ -381,7 +435,83 @@ const handleSavingsGoalDelete = async (id) => {
             class="col-span-full text-center py-12 text-slate-500"
           >
             <TrophyOutlined class="text-4xl mb-4 opacity-50" />
-            <p class="text-sm">Chưa có mục tiêu. Hãy bắt đầu tiết kiệm cho ước mơ của bạn!</p>
+          </div>
+        </div>
+      </a-tab-pane>
+
+      <!-- Categories Tab -->
+      <a-tab-pane key="categories" tab="Danh mục">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Income Categories -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-green-600 flex items-center gap-2">
+               Thu nhập
+            </h3>
+            <div class="space-y-2">
+              <div
+                v-for="cat in finance.incomeCategories"
+                :key="cat.id"
+                class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between group hover:border-blue-400 transition-colors"
+                :class="{ 'border-l-4': true }"
+                :style="{ borderLeftColor: cat.color }"
+              >
+                <div class="flex items-center gap-3">
+                   <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-slate-50"
+                  >
+                    {{ cat.icon || "🏷️" }}
+                  </div>
+                  <div>
+                     <p class="font-medium text-slate-800">{{ cat.name }}</p>
+                    <a-tag v-if="!cat.scope || cat.scope === 'system'" color="blue" class="text-xs">Hệ thống</a-tag>
+                  </div>
+                </div>
+                 <div v-if="cat.scope === 'custom'" class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a-button type="text" size="small" @click="showCategoryModal(cat)">
+                    <template #icon><EditOutlined /></template>
+                  </a-button>
+                  <a-button type="text" danger size="small" @click="handleCategoryDelete(cat.id)">
+                     <template #icon><DeleteOutlined /></template>
+                  </a-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expense Categories -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4 text-red-600 flex items-center gap-2">
+               Chi tiêu
+            </h3>
+            <div class="space-y-2">
+              <div
+                v-for="cat in finance.expenseCategories"
+                :key="cat.id"
+                 class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between group hover:border-blue-400 transition-colors"
+                :class="{ 'border-l-4': true }"
+                :style="{ borderLeftColor: cat.color }"
+              >
+                <div class="flex items-center gap-3">
+                   <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-slate-50"
+                  >
+                    {{ cat.icon || "🏷️" }}
+                  </div>
+                   <div>
+                     <p class="font-medium text-slate-800">{{ cat.name }}</p>
+                    <a-tag v-if="!cat.scope || cat.scope === 'system'" color="blue" class="text-xs">Hệ thống</a-tag>
+                  </div>
+                </div>
+                <div v-if="cat.scope === 'custom'" class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a-button type="text" size="small" @click="showCategoryModal(cat)">
+                     <template #icon><EditOutlined /></template>
+                  </a-button>
+                  <a-button type="text" danger size="small" @click="handleCategoryDelete(cat.id)">
+                    <template #icon><DeleteOutlined /></template>
+                  </a-button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </a-tab-pane>
@@ -409,6 +539,13 @@ const handleSavingsGoalDelete = async (id) => {
       :goal="editingGoal"
       :loading="finance.loading"
       @submit="handleSavingsGoalSubmit"
+    />
+    <CategoryModal
+      v-model:open="categoryModalOpen"
+      v-model:form="categoryForm"
+      :category="editingCategory"
+      :loading="finance.loading"
+      @submit="handleCategorySubmit"
     />
   </div>
 </template>

@@ -1,3 +1,9 @@
+<!--
+  Login.vue
+
+  Login page component.
+  Handles user authentication via email/password.
+-->
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";

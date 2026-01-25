@@ -7,6 +7,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Transaction
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property int $wallet_id
+ * @property int $category_id
+ * @property string $type
+ * @property float $amount
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon $transaction_date
+ * @property string|null $reference
+ * @property array|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User $user
+ * @property-read Wallet $wallet
+ * @property-read Category $category
+ *
+ * @package App\Models
+ */
 class Transaction extends Model
 {
     use HasFactory;

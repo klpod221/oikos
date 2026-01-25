@@ -4,6 +4,13 @@ namespace App\Traits;
 
 use App\Utils\QueryBuilder;
 
+/**
+ * Filterable Trait
+ *
+ * Provides functionality to filter, sort, and search Eloquent queries.
+ *
+ * @package App\Traits
+ */
 trait Filterable
 {
     /**

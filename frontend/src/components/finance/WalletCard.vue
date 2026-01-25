@@ -1,3 +1,13 @@
+<!--
+  WalletCard.vue
+
+  Displays a wallet summary card with balance and actions.
+  Props:
+    - wallet: Wallet object
+  Events:
+    - edit: Emitted when edit selected
+    - delete: Emitted when delete confirmed
+-->
 <script setup>
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { formatCurrency } from "../../utils/formatters";

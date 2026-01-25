@@ -8,10 +8,23 @@ use App\Models\SavingsGoal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Statistics Service
+ *
+ * Service for calculating financial statistics.
+ *
+ * @package App\Services\Finance
+ */
 class StatisticsService
 {
     /**
      * Get comprehensive statistics for a user within a time period
+     *
+     * @param int $userId
+     * @param string $period
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return array
      */
     public function getStatistics(int $userId, string $period, ?string $startDate = null, ?string $endDate = null): array
     {

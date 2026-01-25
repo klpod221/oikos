@@ -1,3 +1,9 @@
+<!--
+  PreferencesForm.vue
+
+  Form for updating user preferences (Currency, Language, Theme, Units).
+  Loads initial settings from store on mount.
+-->
 <script setup>
 import { ref, onMounted } from "vue";
 import { useSettingsStore } from "../../stores/settings";

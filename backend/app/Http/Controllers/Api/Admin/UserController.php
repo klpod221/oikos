@@ -9,14 +9,25 @@ use App\Services\Admin\AdminUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Admin User Controller
+ *
+ * Handles admin management of users.
+ *
+ * @package App\Http\Controllers\Api\Admin
+ */
 class UserController extends Controller
 {
     public function __construct(
         protected AdminUserService $userService
-    ) {}
+    ) {
+    }
 
     /**
      * List all users
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

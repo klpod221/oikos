@@ -1,3 +1,12 @@
+<!--
+  Settings.vue
+
+  User settings view.
+  Tabs:
+  - Profile: Name, Email, Avatar
+  - Preferences: Currency, Language, Theme
+  - Security: Password change
+-->
 <script setup>
 import { ref } from "vue";
 import ProfileForm from "../../components/settings/ProfileForm.vue";

@@ -5,10 +5,21 @@ namespace App\Policies;
 use App\Models\Category;
 use App\Models\User;
 
+/**
+ * Category Policy
+ *
+ * Authorization policy for Category model.
+ *
+ * @package App\Policies
+ */
 class CategoryPolicy
 {
     /**
      * Determine whether the user can view the model.
+     *
+     * @param User $user
+     * @param Category $category
+     * @return bool
      */
     public function view(User $user, Category $category): bool
     {

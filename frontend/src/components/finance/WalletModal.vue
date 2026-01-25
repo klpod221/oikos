@@ -1,3 +1,17 @@
+<!--
+  WalletModal.vue
+
+  Modal form for creating or editing a wallet.
+  Props:
+    - open: Modal visibility
+    - wallet: Wallet object to edit (null for create)
+    - loading: Loading state
+  Model:
+    - form: Form data object
+  Events:
+    - update:open: Sync visibility
+    - submit: Emitted on save
+-->
 <script setup>
 const props = defineProps({
   open: { type: Boolean, default: false },

@@ -5,10 +5,20 @@ namespace App\Services\Finance;
 use App\Models\SavingsGoal;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Savings Goal Service
+ *
+ * Service for managing savings goals.
+ *
+ * @package App\Services\Finance
+ */
 class SavingsGoalService
 {
     /**
      * Get user savings goals
+     *
+     * @param int $userId
+     * @return Collection
      */
     public function getGoals(int $userId): Collection
     {

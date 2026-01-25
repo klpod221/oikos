@@ -5,8 +5,23 @@ namespace App\Services\Nutrition;
 use App\Models\MealPlan;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Meal Plan Service
+ *
+ * Service for managing meal plans.
+ *
+ * @package App\Services\Nutrition
+ */
 class MealPlanService
 {
+    /**
+     * Get meal plans
+     *
+     * @param int $userId
+     * @param string|null $start
+     * @param string|null $end
+     * @return Collection
+     */
     public function getMealPlans(int $userId, ?string $start = null, ?string $end = null): Collection
     {
         $query = MealPlan::where('user_id', $userId)

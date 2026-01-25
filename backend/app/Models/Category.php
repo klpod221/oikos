@@ -8,6 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class Category
+ *
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $name
+ * @property string $type
+ * @property string $scope
+ * @property string|null $icon
+ * @property string|null $color
+ * @property int|null $parent_id
+ * @property int $sort_order
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User|null $user
+ * @property-read Category|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection|Category[] $children
+ * @property-read \Illuminate\Database\Eloquent\Collection|Transaction[] $transactions
+ *
+ * @package App\Models
+ */
 class Category extends Model
 {
     use HasFactory;

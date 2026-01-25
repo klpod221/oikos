@@ -1,3 +1,13 @@
+<!--
+  DefaultLayout.vue
+
+  Main application layout.
+  Features:
+  - Responsive Sidebar/Drawer.
+  - Header with User Menu.
+  - Main Content Area.
+  - Responsive behavior handling (mobile/tablet/desktop).
+-->
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";

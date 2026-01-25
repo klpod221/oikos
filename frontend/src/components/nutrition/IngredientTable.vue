@@ -1,3 +1,14 @@
+<!--
+  IngredientTable.vue
+
+  Displays a table of ingredients with sorting and actions.
+  Props:
+    - ingredients: Array of ingredient objects
+    - loading: Loading state
+  Events:
+    - change: Emitted on table change (pagination, sorting)
+    - delete: Emitted when delete confirmed
+-->
 <script setup>
 import { DeleteOutlined } from "@ant-design/icons-vue";
 

@@ -1,3 +1,16 @@
+<!--
+  TransactionTable.vue
+
+  Displays a table of transactions with pagination and actions.
+  Props:
+    - transactions: Array of transaction objects
+    - loading: Loading state
+    - pagination: Pagination config object
+  Events:
+    - change: Emitted on table change (pagination, filters, sorter)
+    - edit: Emitted when edit clicked
+    - delete: Emitted when delete confirmed
+-->
 <script setup>
 import {
   DeleteOutlined,

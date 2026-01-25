@@ -6,10 +6,21 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * External Data Service
+ *
+ * Service for fetching weather, exchange rates, and metal prices from external APIs.
+ *
+ * @package App\Services
+ */
 class ExternalDataService
 {
     /**
      * Get all external data (weather, exchange rates, metals)
+     *
+     * @param float $lat Latitude
+     * @param float $lon Longitude
+     * @return array
      */
     public function getAllData(float $lat = 21.0285, float $lon = 105.8542): array
     {

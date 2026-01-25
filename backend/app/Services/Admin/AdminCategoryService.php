@@ -5,10 +5,21 @@ namespace App\Services\Admin;
 use App\Models\Category;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
+/**
+ * Admin Category Service
+ *
+ * Service for administrative management of system categories.
+ *
+ * @package App\Services\Admin
+ */
 class AdminCategoryService
 {
     /**
      * Get system categories
+     *
+     * @param array $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
      */
     public function getCategories(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

@@ -1,5 +1,10 @@
 import api from "../utils/axios";
 
+/**
+ * Settings Service
+ *
+ * API endpoints for user settings and profile.
+ */
 export const settingsService = {
   // Get user profile and settings
   getProfile: () => api.get("/user/profile"),

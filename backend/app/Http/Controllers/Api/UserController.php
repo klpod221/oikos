@@ -8,14 +8,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * User Controller
+ *
+ * Handles user profile and settings.
+ *
+ * @package App\Http\Controllers\Api
+ */
 class UserController extends Controller
 {
     public function __construct(
         protected UserSettingsService $userSettingsService
-    ) {}
+    ) {
+    }
 
     /**
      * Get user profile and settings
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function profile(Request $request): JsonResponse
     {

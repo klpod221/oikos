@@ -1,5 +1,10 @@
 import api from "../utils/axios";
 
+/**
+ * Finance Service
+ *
+ * API endpoints for finance module.
+ */
 export const financeService = {
   // Wallets
   getWallets: () => api.get("/wallets"),

@@ -1,3 +1,11 @@
+/**
+ * Nutrition Store
+ *
+ * Manages nutrition module state:
+ * - Ingredients
+ * - Recipes
+ * - Meal Plans (future)
+ */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { nutritionService } from "../services/nutrition.service";

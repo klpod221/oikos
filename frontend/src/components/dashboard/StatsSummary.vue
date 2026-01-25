@@ -1,3 +1,10 @@
+<!--
+  StatsSummary.vue
+
+  Displays cards for Total Income, Total Expense, Net Savings, and Transaction Count.
+  Props:
+    - summary: Object containing summary stats { total_income, total_expense, net_savings, transaction_count }
+-->
 <script setup>
 import { computed } from "vue";
 import { formatCurrency } from "../../utils/formatters";

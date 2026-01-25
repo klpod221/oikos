@@ -10,14 +10,25 @@ use App\Services\Admin\AdminCategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Admin Category Controller
+ *
+ * Handles admin management of system categories.
+ *
+ * @package App\Http\Controllers\Api\Admin
+ */
 class CategoryController extends Controller
 {
     public function __construct(
         protected AdminCategoryService $categoryService
-    ) {}
+    ) {
+    }
 
     /**
      * List system categories
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

@@ -1,3 +1,13 @@
+<!--
+  PeriodSelector.vue
+
+  Allows user to select a time period (Month, Year, Custom).
+  Props:
+    - period: Current selected period string
+  Events:
+    - update:period: Emitted when period changes
+    - customRange: Emitted when custom date range is selected (start, end)
+-->
 <script setup>
 import { computed } from "vue";
 

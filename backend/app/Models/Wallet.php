@@ -7,6 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class Wallet
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property float $balance
+ * @property string $currency
+ * @property string|null $description
+ * @property bool $is_default
+ * @property string|null $icon
+ * @property string|null $color
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User $user
+ * @property-read \Illuminate\Database\Eloquent\Collection|Transaction[] $transactions
+ *
+ * @package App\Models
+ */
 class Wallet extends Model
 {
     use HasFactory;

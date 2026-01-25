@@ -6,10 +6,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class UserSetting
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $currency
+ * @property string $gold_unit
+ * @property string $silver_unit
+ * @property string $language
+ * @property string $theme
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User $user
+ *
+ * @package App\Models
+ */
 class UserSetting extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'user_id',
         'currency',
@@ -20,7 +42,9 @@ class UserSetting extends Model
     ];
 
     /**
-     * Belongs to user
+     * Get the user that owns the settings.
+     *
+     * @return BelongsTo
      */
     public function user(): BelongsTo
     {

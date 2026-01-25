@@ -1,3 +1,9 @@
+<!--
+  ProfileForm.vue
+
+  Form for updating user profile (Name, Email) and Avatar.
+  Handles file upload for avatar.
+-->
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useSettingsStore } from "../../stores/settings";

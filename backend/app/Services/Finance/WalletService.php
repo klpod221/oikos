@@ -6,10 +6,20 @@ use App\Models\Wallet;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Wallet Service
+ *
+ * Service for managing user wallets.
+ *
+ * @package App\Services\Finance
+ */
 class WalletService
 {
     /**
      * Get user wallets
+     *
+     * @param int $userId
+     * @return Collection
      */
     public function getWallets(int $userId): Collection
     {

@@ -9,10 +9,22 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use App\Services\Finance\StatisticsService;
 
+/**
+ * Transaction Service
+ *
+ * Service for managing transactions and updating wallet balances.
+ *
+ * @package App\Services\Finance
+ */
 class TransactionService
 {
     /**
      * Get transactions with filtering
+     *
+     * @param int $userId
+     * @param array $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
      */
     public function getTransactions(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

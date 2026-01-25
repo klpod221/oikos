@@ -1,3 +1,11 @@
+<!--
+  ExternalDataWidget.vue
+
+  Displays real-time external data including:
+  - Weather (Open-Meteo)
+  - Exchange Rates (USD/VND)
+  - Gold/Silver Prices
+-->
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { dashboardService } from "../../services/dashboard.service";

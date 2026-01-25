@@ -6,8 +6,23 @@ use App\Models\Recipe;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Recipe Service
+ *
+ * Service for managing recipes and recalculating nutrition.
+ *
+ * @package App\Services\Nutrition
+ */
 class RecipeService
 {
+    /**
+     * Get recipes with filtering
+     *
+     * @param int $userId
+     * @param array $filters
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
     public function getRecipes(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Recipe::where('user_id', $userId)

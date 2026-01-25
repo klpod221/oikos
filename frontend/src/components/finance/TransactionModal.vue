@@ -1,3 +1,18 @@
+<!--
+  TransactionModal.vue
+
+  Modal form for creating or editing a transaction.
+  Props:
+    - open: Modal visibility
+    - loading: Loading state
+    - wallets: Array of available wallets
+    - categories: Array of available categories
+  Model:
+    - form: Form data object
+  Events:
+    - update:open: Sync visibility
+    - submit: Emitted on save
+-->
 <script setup>
 defineProps({
   open: { type: Boolean, default: false },

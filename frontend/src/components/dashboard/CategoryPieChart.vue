@@ -1,3 +1,10 @@
+<!--
+  CategoryPieChart.vue
+
+  Displays a doughnut chart showing expense distribution by category.
+  Props:
+    - byCategory: Array of category data objects { category_name, total, percentage, type }
+-->
 <script setup>
 import { computed } from "vue";
 import { Doughnut } from "vue-chartjs";

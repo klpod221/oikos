@@ -1,3 +1,13 @@
+<!--
+  Users.vue
+
+  Admin view for managing users.
+  Features:
+  - List users
+  - Block/Unblock users (except admin)
+  - Search by name/email
+  - Filter by role/status
+-->
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useAdminStore } from "../../stores/admin";

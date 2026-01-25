@@ -10,14 +10,25 @@ use App\Services\Admin\AdminIngredientService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Admin Ingredient Controller
+ *
+ * Handles admin management of global ingredients.
+ *
+ * @package App\Http\Controllers\Api\Admin
+ */
 class IngredientController extends Controller
 {
     public function __construct(
         protected AdminIngredientService $ingredientService
-    ) {}
+    ) {
+    }
 
     /**
      * List global ingredients
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

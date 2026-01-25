@@ -1,3 +1,8 @@
+/**
+ * Formatters Utility
+ *
+ * Helper functions for formatting currency, dates, and metal units.
+ */
 import dayjs from "dayjs";
 
 export const CURRENCY_SYMBOLS = {

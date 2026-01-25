@@ -11,16 +11,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Finance Category Controller
+ *
+ * Handles management of user categories (income/expense).
+ *
+ * @package App\Http\Controllers\Api\Finance
+ */
 class CategoryController extends Controller
 {
     public function __construct(
         protected CategoryService $categoryService
-    ) {}
+    ) {
+    }
 
     /**
      * List Categories
      *
      * Get a list of categories (system default + user custom).
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

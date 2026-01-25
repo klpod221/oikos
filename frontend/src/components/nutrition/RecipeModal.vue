@@ -1,3 +1,17 @@
+<!--
+  RecipeModal.vue
+
+  Modal form for creating or editing a recipe.
+  Props:
+    - open: Modal visibility
+    - loading: Loading state
+    - recipe: Recipe object (null for create)
+  Model:
+    - form: Form data object
+  Events:
+    - update:open: Sync visibility
+    - submit: Emitted on save
+-->
 <script setup>
 defineProps({
   open: { type: Boolean, default: false },

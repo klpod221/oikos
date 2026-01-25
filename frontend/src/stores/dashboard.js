@@ -1,3 +1,10 @@
+/**
+ * Dashboard Store
+ *
+ * Manages dashboard state:
+ * - Statistics data
+ * - Selected time period/range
+ */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { dashboardService } from "../services/dashboard.service";

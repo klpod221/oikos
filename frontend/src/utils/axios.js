@@ -1,3 +1,11 @@
+/**
+ * Axios Instance
+ *
+ * Configured axios instance with base URL and interceptors.
+ * - Base URL: /api
+ * - Request Interceptor: Attaches Bearer token
+ * - Response Interceptor: Handles 401 Unauthorized (redirects to login)
+ */
 import axios from "axios";
 
 const api = axios.create({

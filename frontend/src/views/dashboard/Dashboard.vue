@@ -1,3 +1,13 @@
+<!--
+  Dashboard.vue
+
+  Main dashboard view.
+  Displays:
+  - Welcome message
+  - Period selector
+  - External data widget
+  - Statistics summary (charts, cards)
+-->
 <script setup>
 import { onMounted } from "vue";
 import { useDashboardStore } from "../../stores/dashboard";

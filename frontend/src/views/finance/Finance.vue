@@ -1,3 +1,14 @@
+<!--
+  Finance.vue
+
+  Main finance module view.
+  Tabs:
+  - Wallets: Manage wallets
+  - Transactions: List/Filter transactions
+  - Savings Goals: Manage goals
+  Features:
+  - Create/Edit/Delete for all entities
+-->
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import { useFinanceStore } from "../../stores/finance";

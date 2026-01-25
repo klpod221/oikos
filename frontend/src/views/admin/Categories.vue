@@ -1,3 +1,12 @@
+<!--
+  Categories.vue
+
+  Admin view for managing system categories.
+  Features:
+  - List categories (income/expense)
+  - Create/Edit/Delete categories
+  - Filter by type and search by name
+-->
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useAdminStore } from "../../stores/admin";

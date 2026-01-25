@@ -1,3 +1,10 @@
+/**
+ * Settings Store
+ *
+ * Manages user settings state:
+ * - User Profile updating
+ * - Preferences (Currency, Language, etc.)
+ */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { settingsService } from "../services/settings.service";

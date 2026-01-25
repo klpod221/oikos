@@ -1,5 +1,10 @@
 import api from "../utils/axios";
 
+/**
+ * Nutrition Service
+ *
+ * API endpoints for nutrition module.
+ */
 export const nutritionService = {
   // Ingredients
   getIngredients: (filters = {}, page = 1, perPage = 15) =>

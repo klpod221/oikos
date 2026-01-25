@@ -1,3 +1,10 @@
+<!--
+  IncomeExpenseChart.vue
+
+  Displays a bar chart comparing income vs expenses over time.
+  Props:
+    - dailyTrend: Array of daily data objects { date, income, expense }
+-->
 <script setup>
 import { computed } from "vue";
 import { Bar } from "vue-chartjs";

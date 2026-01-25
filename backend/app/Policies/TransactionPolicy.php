@@ -5,10 +5,21 @@ namespace App\Policies;
 use App\Models\Transaction;
 use App\Models\User;
 
+/**
+ * Transaction Policy
+ *
+ * Authorization policy for Transaction model.
+ *
+ * @package App\Policies
+ */
 class TransactionPolicy
 {
     /**
      * Determine whether the user can view the model.
+     *
+     * @param User $user
+     * @param Transaction $transaction
+     * @return bool
      */
     public function view(User $user, Transaction $transaction): bool
     {

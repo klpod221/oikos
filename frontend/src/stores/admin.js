@@ -1,3 +1,11 @@
+/**
+ * Admin Store
+ *
+ * Manages administrative state:
+ * - Users (list, block, unblock)
+ * - Categories (system categories management)
+ * - Ingredients (global ingredients management)
+ */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import {

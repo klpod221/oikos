@@ -1,3 +1,12 @@
+/**
+ * Finance Store
+ *
+ * Manages finance module state:
+ * - Wallets
+ * - Transactions
+ * - Savings Goals
+ * - Categories
+ */
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { financeService } from "../services/finance.service";

@@ -11,12 +11,26 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Meal Plan Controller
+ *
+ * Handles management of meal plans.
+ *
+ * @package App\Http\Controllers\Api\Nutrition
+ */
 class MealPlanController extends Controller
 {
     public function __construct(
         protected MealPlanService $mealPlanService
-    ) {}
+    ) {
+    }
 
+    /**
+     * List Meal Plans
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
         $plans = $this->mealPlanService->getMealPlans(

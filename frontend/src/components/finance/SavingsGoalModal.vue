@@ -1,3 +1,15 @@
+<!--
+  SavingsGoalModal.vue
+
+  Modal form for creating or editing a savings goal.
+  Props:
+    - open: Modal visibility
+    - goal: Goal object to edit (null for create)
+    - loading: Loading state
+  Events:
+    - update:open: Sync visibility
+    - submit: Emitted with form data on save
+-->
 <script setup>
 import { ref, watch } from "vue";
 

@@ -11,12 +11,26 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Nutrition Ingredient Controller
+ *
+ * Handles management of ingredients (global + custom).
+ *
+ * @package App\Http\Controllers\Api\Nutrition
+ */
 class IngredientController extends Controller
 {
     public function __construct(
         protected IngredientService $ingredientService
-    ) {}
+    ) {
+    }
 
+    /**
+     * List Ingredients
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
         $ingredients = $this->ingredientService->getIngredients(

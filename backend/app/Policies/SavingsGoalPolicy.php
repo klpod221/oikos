@@ -5,10 +5,21 @@ namespace App\Policies;
 use App\Models\SavingsGoal;
 use App\Models\User;
 
+/**
+ * Savings Goal Policy
+ *
+ * Authorization policy for SavingsGoal model.
+ *
+ * @package App\Policies
+ */
 class SavingsGoalPolicy
 {
     /**
      * Determine whether the user can view the model.
+     *
+     * @param User $user
+     * @param SavingsGoal $savingsGoal
+     * @return bool
      */
     public function view(User $user, SavingsGoal $savingsGoal): bool
     {

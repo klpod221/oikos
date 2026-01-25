@@ -1,3 +1,10 @@
+<!--
+  TopExpensesTable.vue
+
+  Displays a table of the top expense categories.
+  Props:
+    - topExpenses: Array of expense objects { category_name, icon, amount, transactions }
+-->
 <script setup>
 import { formatCurrency } from "../../utils/formatters";
 

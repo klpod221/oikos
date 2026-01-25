@@ -7,6 +7,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Ingredient
+ *
+ * @property int $id
+ * @property int|null $user_id
+ * @property bool $is_global
+ * @property string $name
+ * @property string $unit
+ * @property float|null $calories
+ * @property float|null $protein
+ * @property float|null $carbs
+ * @property float|null $fat
+ * @property float|null $fiber
+ * @property float|null $sugar
+ * @property string|null $image
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User|null $user
+ *
+ * @package App\Models
+ */
 class Ingredient extends Model
 {
     use HasFactory;

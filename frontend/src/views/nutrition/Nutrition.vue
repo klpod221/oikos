@@ -1,3 +1,12 @@
+<!--
+  Nutrition.vue
+
+  Main nutrition module view.
+  Tabs:
+  - Ingredients: Manage personal ingredients? (Actually uses global for now)
+  - Recipes: Manage recipes
+  - Meal Plans: Placeholder
+-->
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useNutritionStore } from "../../stores/nutrition";

@@ -5,10 +5,21 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Wallet;
 
+/**
+ * Wallet Policy
+ *
+ * Authorization policy for Wallet model.
+ *
+ * @package App\Policies
+ */
 class WalletPolicy
 {
     /**
      * Determine whether the user can view the model.
+     *
+     * @param User $user
+     * @param Wallet $wallet
+     * @return bool
      */
     public function view(User $user, Wallet $wallet): bool
     {

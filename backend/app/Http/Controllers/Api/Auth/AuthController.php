@@ -11,16 +11,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Auth Controller
+ *
+ * Handles user authentication (login, register, logout).
+ *
+ * @package App\Http\Controllers\Api\Auth
+ */
 class AuthController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {}
+    ) {
+    }
 
     /**
      * Login
      *
      * Authenticate user with email and password to receive an access token.
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {

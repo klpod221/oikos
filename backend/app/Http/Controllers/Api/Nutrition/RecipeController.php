@@ -11,12 +11,26 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Recipe Controller
+ *
+ * Handles management of recipes.
+ *
+ * @package App\Http\Controllers\Api\Nutrition
+ */
 class RecipeController extends Controller
 {
     public function __construct(
         protected RecipeService $recipeService
-    ) {}
+    ) {
+    }
 
+    /**
+     * List Recipes
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function index(Request $request): JsonResponse
     {
         $recipes = $this->recipeService->getRecipes(

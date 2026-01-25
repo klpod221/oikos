@@ -5,10 +5,20 @@ namespace App\Services\Finance;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Category Service
+ *
+ * Service for managing user categories (income/expense).
+ *
+ * @package App\Services\Finance
+ */
 class CategoryService
 {
     /**
      * Get available categories for user (System + Custom)
+     *
+     * @param int $userId
+     * @return Collection
      */
     public function getCategories(int $userId): Collection
     {
@@ -17,12 +27,14 @@ class CategoryService
                 ->orWhere('scope', Category::SCOPE_SYSTEM);
         })
             ->whereNull('parent_id')
-            ->with(['children' => function ($q) use ($userId) {
-                $q->where(function ($sub) use ($userId) {
-                    $sub->where('user_id', $userId)
-                        ->orWhere('scope', Category::SCOPE_SYSTEM);
-                })->orderBy('sort_order');
-            }])
+            ->with([
+                'children' => function ($q) use ($userId) {
+                    $q->where(function ($sub) use ($userId) {
+                        $sub->where('user_id', $userId)
+                            ->orWhere('scope', Category::SCOPE_SYSTEM);
+                    })->orderBy('sort_order');
+                }
+            ])
             ->orderBy('type')
             ->orderBy('sort_order')
             ->get();

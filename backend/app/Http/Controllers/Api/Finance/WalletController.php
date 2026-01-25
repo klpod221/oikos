@@ -11,16 +11,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Wallet Controller
+ *
+ * Handles management of user wallets.
+ *
+ * @package App\Http\Controllers\Api\Finance
+ */
 class WalletController extends Controller
 {
     public function __construct(
         protected WalletService $walletService
-    ) {}
+    ) {
+    }
 
     /**
      * List Wallets
      *
      * Get a list of all wallets belonging to the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

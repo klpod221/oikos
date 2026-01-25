@@ -1,3 +1,16 @@
+<!--
+  IngredientModal.vue
+
+  Modal form for creating or editing an ingredient.
+  Props:
+    - open: Modal visibility
+    - loading: Loading state
+  Model:
+    - form: Form data object
+  Events:
+    - update:open: Sync visibility
+    - submit: Emitted on save
+-->
 <script setup>
 defineProps({
   open: { type: Boolean, default: false },

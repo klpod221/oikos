@@ -1,3 +1,9 @@
+<!--
+  Register.vue
+
+  Registration page component.
+  Handles new user registration.
+-->
 <script setup>
 import { reactive } from "vue";
 import { useRouter } from "vue-router";

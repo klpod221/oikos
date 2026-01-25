@@ -1,3 +1,11 @@
+<!--
+  AuthLayout.vue
+
+  Layout for authentication pages (Login, Register).
+  Features:
+  - Branding on left side (desktop).
+  - Form slot on right side.
+-->
 <script setup>
 import { HeartFilled } from "@ant-design/icons-vue";
 </script>

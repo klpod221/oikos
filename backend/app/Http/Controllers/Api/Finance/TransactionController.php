@@ -11,16 +11,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Transaction Controller
+ *
+ * Handles management of transactions (income/expense).
+ *
+ * @package App\Http\Controllers\Api\Finance
+ */
 class TransactionController extends Controller
 {
     public function __construct(
         protected TransactionService $transactionService
-    ) {}
+    ) {
+    }
 
     /**
      * List Transactions
      *
      * Get a paginated list of transactions with optional filtering.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

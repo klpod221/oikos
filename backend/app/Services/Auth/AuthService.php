@@ -6,6 +6,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Auth Service
+ *
+ * Service for user authentication and registration.
+ *
+ * @package App\Services\Auth
+ */
 class AuthService
 {
     /**
@@ -21,7 +28,7 @@ class AuthService
     {
         $user = User::where('email', $email)->first();
 
-        if (! $user || ! Hash::check($password, $user->password)) {
+        if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => [__('auth.failed')],
             ]);

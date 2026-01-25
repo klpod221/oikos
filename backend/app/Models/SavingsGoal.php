@@ -9,8 +9,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * @property Carbon|null $start_date
- * @property Carbon|null $deadline
+ * Class SavingsGoal
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $name
+ * @property string|null $description
+ * @property float $target_amount
+ * @property float $current_amount
+ * @property string $currency
+ * @property \Illuminate\Support\Carbon|null $start_date
+ * @property \Illuminate\Support\Carbon|null $deadline
+ * @property string $status
+ * @property string|null $icon
+ * @property string|null $color
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read User $user
+ *
+ * @package App\Models
  */
 class SavingsGoal extends Model
 {

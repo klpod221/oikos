@@ -1,3 +1,13 @@
+<!--
+  SavingsGoalCard.vue
+
+  Displays a single savings goal with progress bar and actions.
+  Props:
+    - goal: Goal object
+  Events:
+    - edit: Emitted when edit selected
+    - delete: Emitted when delete confirmed
+-->
 <script setup>
 defineProps({
   goal: { type: Object, required: true },

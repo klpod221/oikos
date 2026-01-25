@@ -1,3 +1,12 @@
+<!--
+  PasswordForm.vue
+
+  Form for changing user password.
+  Validation:
+  - Checks if old password is provided.
+  - Checks if new password is at least 8 chars.
+  - Checks if confirmation matches new password.
+-->
 <script setup>
 import { ref } from "vue";
 import { useSettingsStore } from "../../stores/settings";

@@ -1,3 +1,12 @@
+<!--
+  Ingredients.vue
+
+  Admin view for managing global ingredients.
+  Features:
+  - List ingredients with nutrition info
+  - Create/Edit/Delete ingredients
+  - Search by name
+-->
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useAdminStore } from "../../stores/admin";

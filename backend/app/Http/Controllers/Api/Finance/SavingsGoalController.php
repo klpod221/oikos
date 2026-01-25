@@ -11,16 +11,27 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * Savings Goal Controller
+ *
+ * Handles management of savings goals.
+ *
+ * @package App\Http\Controllers\Api\Finance
+ */
 class SavingsGoalController extends Controller
 {
     public function __construct(
         protected SavingsGoalService $goalService
-    ) {}
+    ) {
+    }
 
     /**
      * List Savings Goals
      *
      * Get a list of all savings goals.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

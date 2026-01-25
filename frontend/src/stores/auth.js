@@ -1,3 +1,11 @@
+/**
+ * Auth Store
+ *
+ * Manages authentication state:
+ * - User profile
+ * - Auth token
+ * - Login/Register/Logout actions
+ */
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { authService } from "../services/auth.service";

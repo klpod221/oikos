@@ -1,3 +1,13 @@
+<!--
+  RecipeCard.vue
+
+  Displays a recipe summary card with actions.
+  Props:
+    - recipe: Recipe object
+  Events:
+    - edit: Emitted when edit selected
+    - delete: Emitted when delete confirmed
+-->
 <script setup>
 import {
   EditOutlined,

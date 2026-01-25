@@ -7,17 +7,28 @@ use App\Services\ExternalDataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * External Data Controller
+ *
+ * Handles requests for weather, exchange rates, and metal prices.
+ *
+ * @package App\Http\Controllers\Api
+ */
 class ExternalDataController extends Controller
 {
     public function __construct(
         protected ExternalDataService $externalDataService
-    ) {}
+    ) {
+    }
 
     /**
      * Get External Data
      *
      * Get weather, exchange rates, and metal prices.
      * Data is cached for 1 hour.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

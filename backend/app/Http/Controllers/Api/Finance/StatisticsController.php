@@ -7,11 +7,19 @@ use App\Services\Finance\StatisticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Statistics Controller
+ *
+ * Handles retrieval of financial statistics.
+ *
+ * @package App\Http\Controllers\Api\Finance
+ */
 class StatisticsController extends Controller
 {
     public function __construct(
         protected StatisticsService $statisticsService
-    ) {}
+    ) {
+    }
 
     /**
      * Get Statistics
@@ -19,6 +27,9 @@ class StatisticsController extends Controller
      * Get comprehensive financial statistics for a specific time period.
      * Supports preset periods (this_month, last_month, this_year, last_year) and custom date ranges.
      * Results are cached for performance.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {

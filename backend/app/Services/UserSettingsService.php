@@ -8,10 +8,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * User Settings Service
+ *
+ * Service for managing user profile, avatar, and settings.
+ *
+ * @package App\Services
+ */
 class UserSettingsService
 {
     /**
      * Update user profile (name, email)
+     *
+     * @param User $user
+     * @param array $data
+     * @return User
      */
     public function updateProfile(User $user, array $data): User
     {

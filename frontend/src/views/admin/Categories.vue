@@ -8,7 +8,7 @@
   - Filter by type and search by name
 -->
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useAdminStore } from "../../stores/admin";
 import { message, Modal } from "ant-design-vue";
 import {
@@ -19,6 +19,8 @@ import {
   TagsOutlined,
 } from "@ant-design/icons-vue";
 import { formatDate } from "../../utils/formatters";
+
+import { debounce } from "../../utils/debounce";
 
 const adminStore = useAdminStore();
 
@@ -87,15 +89,24 @@ onMounted(() => {
 });
 
 // Watch filters and trigger search
-watch([searchQuery, typeFilter], () => {
-  adminStore.categoryFilters.search = searchQuery.value;
-  adminStore.categoryFilters.type = typeFilter.value;
+const debouncedSearch = debounce((search, type) => {
+  adminStore.categoryFilters.search = search;
+  adminStore.categoryFilters.type = type;
   adminStore.fetchCategories(1);
+}, 500);
+
+watch([searchQuery, typeFilter], () => {
+  debouncedSearch(searchQuery.value, typeFilter.value);
 });
 
-const handlePageChange = (page) => {
-  adminStore.fetchCategories(page);
-};
+const paginationConfig = computed(() => ({
+  current: adminStore.categoryPagination.currentPage,
+  pageSize: adminStore.categoryPagination.perPage,
+  total: adminStore.categoryPagination.total,
+  showSizeChanger: true,
+  showTotal: (total) => `Tổng ${total} danh mục`,
+  position: ["bottomCenter"],
+}));
 
 const handleTableChange = (pagination, filters, sorter) => {
   if (sorter.field && sorter.order) {
@@ -240,7 +251,7 @@ const getTypeText = (type) => {
         :columns="columns"
         :data-source="adminStore.categories"
         :loading="adminStore.loading"
-        :pagination="false"
+        :pagination="paginationConfig"
         :row-key="(record) => record.id"
         @change="handleTableChange"
         :scroll="{ x: 'max-content' }"
@@ -309,18 +320,6 @@ const getTypeText = (type) => {
           </template>
         </template>
       </a-table>
-
-      <!-- Pagination -->
-      <div class="p-4 border-t border-slate-200">
-        <a-pagination
-          v-model:current="adminStore.categoryPagination.currentPage"
-          :total="adminStore.categoryPagination.total"
-          :page-size="adminStore.categoryPagination.perPage"
-          :show-total="(total) => `Tổng ${total} danh mục`"
-          show-size-changer
-          @change="handlePageChange"
-        />
-      </div>
     </div>
 
     <!-- Create/Edit Modal -->

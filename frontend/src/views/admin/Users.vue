@@ -9,7 +9,7 @@
   - Filter by role/status
 -->
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useAdminStore } from "../../stores/admin";
 import { useAuthStore } from "../../stores/auth";
 import { message, Modal } from "ant-design-vue";
@@ -21,6 +21,8 @@ import {
   EyeOutlined,
 } from "@ant-design/icons-vue";
 import { formatDate } from "../../utils/formatters";
+
+import { debounce } from "../../utils/debounce";
 
 const adminStore = useAdminStore();
 const authStore = useAuthStore();
@@ -80,16 +82,25 @@ onMounted(() => {
 });
 
 // Watch filters and trigger search
-watch([searchQuery, roleFilter, statusFilter], () => {
-  adminStore.userFilters.search = searchQuery.value;
-  adminStore.userFilters.role = roleFilter.value;
-  adminStore.userFilters.status = statusFilter.value;
+const debouncedSearch = debounce((search, role, status) => {
+  adminStore.userFilters.search = search;
+  adminStore.userFilters.role = role;
+  adminStore.userFilters.status = status;
   adminStore.fetchUsers(1);
+}, 500);
+
+watch([searchQuery, roleFilter, statusFilter], () => {
+  debouncedSearch(searchQuery.value, roleFilter.value, statusFilter.value);
 });
 
-const handlePageChange = (page) => {
-  adminStore.fetchUsers(page);
-};
+const paginationConfig = computed(() => ({
+  current: adminStore.userPagination.currentPage,
+  pageSize: adminStore.userPagination.perPage,
+  total: adminStore.userPagination.total,
+  showSizeChanger: true,
+  showTotal: (total) => `Tổng ${total} người dùng`,
+  position: ["bottomCenter"],
+}));
 
 const handleTableChange = (pagination, filters, sorter) => {
   if (sorter.field && sorter.order) {
@@ -207,7 +218,7 @@ const getStatusText = (status) => {
         :columns="columns"
         :data-source="adminStore.users"
         :loading="adminStore.loading"
-        :pagination="false"
+        :pagination="paginationConfig"
         :row-key="(record) => record.id"
         @change="handleTableChange"
         :scroll="{ x: 'max-content' }"
@@ -275,18 +286,6 @@ const getStatusText = (status) => {
           </template>
         </template>
       </a-table>
-
-      <!-- Pagination -->
-      <div class="p-4 border-t border-slate-200">
-        <a-pagination
-          v-model:current="adminStore.userPagination.currentPage"
-          :total="adminStore.userPagination.total"
-          :page-size="adminStore.userPagination.perPage"
-          :show-total="(total) => `Tổng ${total} người dùng`"
-          show-size-changer
-          @change="handlePageChange"
-        />
-      </div>
     </div>
   </div>
 </template>

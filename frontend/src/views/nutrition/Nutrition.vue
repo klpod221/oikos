@@ -8,7 +8,7 @@
   - Meal Plans: Placeholder
 -->
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useNutritionStore } from "../../stores/nutrition";
 import {
   PlusOutlined,
@@ -23,14 +23,21 @@ import IngredientTable from "../../components/nutrition/IngredientTable.vue";
 import IngredientModal from "../../components/nutrition/IngredientModal.vue";
 import RecipeCard from "../../components/nutrition/RecipeCard.vue";
 import RecipeModal from "../../components/nutrition/RecipeModal.vue";
+import RecipeDetailModal from "../../components/nutrition/RecipeDetailModal.vue";
+import MealPlanCalendar from "../../components/nutrition/MealPlanCalendar.vue";
+
+import { debounce } from "../../utils/debounce";
 
 const nutrition = useNutritionStore();
 const activeTab = ref("ingredients");
 
 // Modal states
 const ingredientModalOpen = ref(false);
+const editingIngredient = ref(null);
 const recipeModalOpen = ref(false);
+const recipeDetailModalOpen = ref(false);
 const editingRecipe = ref(null);
+const viewingRecipe = ref(null);
 
 // Search filters
 const ingredientSearch = ref("");
@@ -65,42 +72,68 @@ onMounted(async () => {
 });
 
 // Watch ingredient search
-watch(ingredientSearch, () => {
-  nutrition.ingredientFilters.search = ingredientSearch.value;
+const debouncedIngredientSearch = debounce((query) => {
+  nutrition.ingredientFilters.search = query;
   nutrition.fetchIngredients(1);
+}, 500);
+
+watch(ingredientSearch, () => {
+  debouncedIngredientSearch(ingredientSearch.value);
 });
 
 // Watch recipe search
-watch(recipeSearch, () => {
-  nutrition.recipeFilters.search = recipeSearch.value;
+const debouncedRecipeSearch = debounce((query) => {
+  nutrition.recipeFilters.search = query;
   nutrition.fetchRecipes(1);
+}, 500);
+
+watch(recipeSearch, () => {
+  debouncedRecipeSearch(recipeSearch.value);
 });
 
 // Ingredient handlers
-const openIngredientModal = () => {
-  ingredientForm.value = {
-    name: "",
-    unit: "g",
-    calories: 0,
-    protein: 0,
-    carbs: 0,
-    fat: 0,
-    fiber: 0,
-    sugar: 0,
-  };
+// Ingredient handlers
+const openIngredientModal = (ingredient = null) => {
+  // Check if ingredient is a click event or synthetic event
+  const isEvent = ingredient && (ingredient instanceof Event || ingredient.type === 'click');
+  const targetIngredient = isEvent ? null : ingredient;
+
+  editingIngredient.value = targetIngredient;
+  ingredientForm.value = targetIngredient
+    ? { ...targetIngredient }
+    : {
+        name: "",
+        unit: "g",
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        fiber: 0,
+        sugar: 0,
+      };
   ingredientModalOpen.value = true;
 };
 
 const handleIngredientSubmit = async (data) => {
-  const success = await nutrition.createIngredient(data);
+  const success = editingIngredient.value
+    ? await nutrition.updateIngredient(editingIngredient.value.id, data)
+    : await nutrition.createIngredient(data);
   if (success) ingredientModalOpen.value = false;
+};
+
+const handleIngredientDelete = async (id) => {
+    await nutrition.deleteIngredient(id);
 };
 
 // Recipe handlers
 const openRecipeModal = (recipe = null) => {
-  editingRecipe.value = recipe;
-  recipeForm.value = recipe
-    ? { ...recipe }
+  // Check if recipe is a click event
+  const isEvent = recipe && (recipe instanceof Event || recipe.type === 'click');
+  const targetRecipe = isEvent ? null : recipe;
+
+  editingRecipe.value = targetRecipe;
+  recipeForm.value = targetRecipe
+    ? { ...targetRecipe }
     : {
         name: "",
         description: "",
@@ -116,8 +149,15 @@ const openRecipeModal = (recipe = null) => {
   recipeModalOpen.value = true;
 };
 
+const openRecipeDetail = (recipe) => {
+  viewingRecipe.value = recipe;
+  recipeDetailModalOpen.value = true;
+};
+
 const handleRecipeSubmit = async (data) => {
-  const success = await nutrition.createRecipe(data);
+  const success = editingRecipe.value
+    ? await nutrition.updateRecipe(editingRecipe.value.id, data)
+    : await nutrition.createRecipe(data);
   if (success) recipeModalOpen.value = false;
 };
 
@@ -125,9 +165,14 @@ const handleRecipeDelete = async (id) => {
   await nutrition.deleteRecipe(id);
 };
 
-const handleIngredientPageChange = (page) => {
-  nutrition.fetchIngredients(page);
-};
+const ingredientPaginationConfig = computed(() => ({
+  current: nutrition.ingredientPagination.currentPage,
+  pageSize: nutrition.ingredientPagination.perPage,
+  total: nutrition.ingredientPagination.total,
+  showSizeChanger: true,
+  showTotal: (total) => `Tổng ${total} nguyên liệu`,
+  position: ["bottomCenter"],
+}));
 
 const handleRecipePageChange = (page) => {
   nutrition.fetchRecipes(page);
@@ -185,7 +230,10 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
         <IngredientTable
           :ingredients="nutrition.ingredients"
           :loading="nutrition.loading"
+          :pagination="ingredientPaginationConfig"
           @change="handleIngredientTableChange"
+          @edit="openIngredientModal"
+          @delete="handleIngredientDelete"
         />
         <div
           v-if="nutrition.ingredients.length === 0 && !nutrition.loading"
@@ -193,18 +241,6 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
         >
           <ExperimentOutlined class="text-4xl mb-4 opacity-50" />
           <p>Chưa có nguyên liệu. Hãy thêm nguyên liệu đầu tiên!</p>
-        </div>
-        <div
-          v-if="nutrition.ingredients.length > 0"
-          class="mt-4 flex justify-center"
-        >
-          <a-pagination
-            v-model:current="nutrition.ingredientPagination.currentPage"
-            :total="nutrition.ingredientPagination.total"
-            :page-size="nutrition.ingredientPagination.perPage"
-            :show-total="(total) => `Tổng ${total} nguyên liệu`"
-            @change="handleIngredientPageChange"
-          />
         </div>
       </a-tab-pane>
 
@@ -236,6 +272,7 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
             :recipe="recipe"
             @edit="openRecipeModal"
             @delete="handleRecipeDelete"
+            @view="openRecipeDetail"
           />
           <div
             v-if="nutrition.recipes.length === 0 && !nutrition.loading"
@@ -264,10 +301,7 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
         <template #tab
           ><span><CalendarOutlined /> Kế hoạch ăn uống</span></template
         >
-        <div class="text-center py-12 text-slate-500">
-          <CalendarOutlined class="text-4xl mb-4 opacity-50" />
-          <p>Tính năng lập kế hoạch ăn uống đang được phát triển!</p>
-        </div>
+        <MealPlanCalendar />
       </a-tab-pane>
     </a-tabs>
 
@@ -275,6 +309,7 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
     <IngredientModal
       v-model:open="ingredientModalOpen"
       v-model:form="ingredientForm"
+      :ingredient="editingIngredient"
       :loading="nutrition.loading"
       @submit="handleIngredientSubmit"
     />
@@ -283,7 +318,12 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
       v-model:form="recipeForm"
       :recipe="editingRecipe"
       :loading="nutrition.loading"
+      :ingredients="nutrition.ingredients"
       @submit="handleRecipeSubmit"
+    />
+    <RecipeDetailModal
+      v-model:open="recipeDetailModalOpen"
+      :recipe="viewingRecipe"
     />
   </div>
 </template>

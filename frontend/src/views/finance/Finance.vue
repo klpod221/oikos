@@ -32,6 +32,7 @@ import SavingsGoalCard from "../../components/finance/SavingsGoalCard.vue";
 import SavingsGoalModal from "../../components/finance/SavingsGoalModal.vue";
 import CategoryModal from "../../components/finance/CategoryModal.vue";
 import { formatCurrency } from "../../utils/formatters";
+import { debounce } from "../../utils/debounce";
 
 const finance = useFinanceStore();
 const activeTab = ref("wallets");
@@ -60,11 +61,18 @@ const paginationConfig = computed(() => ({
   total: finance.transactionPagination.total,
   showSizeChanger: true,
   showTotal: (total) => `Tổng ${total} giao dịch`,
+  position: ["bottomCenter"],
 }));
 
 // Watch filters
-watch([searchQuery, typeFilter, walletFilter, dateRange], () => {
+const debouncedFetch = debounce(() => {
   fetchTransactions(1);
+}, 500);
+
+watch([searchQuery, typeFilter, walletFilter, dateRange], () => {
+  // If only search changed, we rely on debounce logic implicitly if we wanted, 
+  // but here we debounce the fetch action itself to cover all filter changes mostly for search
+  debouncedFetch();
 });
 
 const fetchTransactions = (page = 1) => {
@@ -411,13 +419,6 @@ const handleCategoryDelete = async (id) => {
           @edit="openTransactionModal"
           @delete="handleTransactionDelete"
         />
-        <div
-          v-if="finance.transactions.length === 0 && !finance.loading"
-          class="text-center py-12 text-slate-500"
-        >
-          <SwapOutlined class="text-4xl mb-4 opacity-50" />
-          <p>Chưa có giao dịch. Thêm giao dịch đầu tiên của bạn!</p>
-        </div>
       </a-tab-pane>
 
       <!-- Savings Goals Tab -->

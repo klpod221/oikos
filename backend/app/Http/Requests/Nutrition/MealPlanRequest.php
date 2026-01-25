@@ -18,7 +18,7 @@ class MealPlanRequest extends FormRequest
             'date' => ['required', 'date'],
             'meal_type' => ['required', Rule::in(['breakfast', 'lunch', 'dinner', 'snack'])],
             'recipe_id' => ['nullable', 'exists:recipes,id'],
-            'description' => ['nullable', 'string'], // Required if recipe_id is null? Optional logic.
+            'description' => ['required_without:recipe_id', 'nullable', 'string'],
             'status' => ['nullable', Rule::in(['planned', 'completed', 'skipped'])],
         ];
     }

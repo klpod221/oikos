@@ -8,7 +8,7 @@
   - Search by name
 -->
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useAdminStore } from "../../stores/admin";
 import { message, Modal } from "ant-design-vue";
 import {
@@ -19,6 +19,8 @@ import {
   CoffeeOutlined,
 } from "@ant-design/icons-vue";
 import { formatDate } from "../../utils/formatters";
+
+import { debounce } from "../../utils/debounce";
 
 const adminStore = useAdminStore();
 
@@ -103,14 +105,23 @@ onMounted(() => {
 });
 
 // Watch filters and trigger search
-watch([searchQuery], () => {
-  adminStore.ingredientFilters.search = searchQuery.value;
+const debouncedSearch = debounce((query) => {
+  adminStore.ingredientFilters.search = query;
   adminStore.fetchIngredients(1);
+}, 500);
+
+watch([searchQuery], () => {
+  debouncedSearch(searchQuery.value);
 });
 
-const handlePageChange = (page) => {
-  adminStore.fetchIngredients(page);
-};
+const paginationConfig = computed(() => ({
+  current: adminStore.ingredientPagination.currentPage,
+  pageSize: adminStore.ingredientPagination.perPage,
+  total: adminStore.ingredientPagination.total,
+  showSizeChanger: true,
+  showTotal: (total) => `Tổng ${total} nguyên liệu`,
+  position: ["bottomCenter"],
+}));
 
 const handleTableChange = (pagination, filters, sorter) => {
   if (sorter.field && sorter.order) {
@@ -241,7 +252,7 @@ const handleDelete = (ingredient) => {
         :columns="columns"
         :data-source="adminStore.ingredients"
         :loading="adminStore.loading"
-        :pagination="false"
+        :pagination="paginationConfig"
         :row-key="(record) => record.id"
         :scroll="{ x: 'max-content' }"
         size="small"
@@ -308,18 +319,6 @@ const handleDelete = (ingredient) => {
           </template>
         </template>
       </a-table>
-
-      <!-- Pagination -->
-      <div class="p-4 border-t border-slate-200">
-        <a-pagination
-          v-model:current="adminStore.ingredientPagination.currentPage"
-          :total="adminStore.ingredientPagination.total"
-          :page-size="adminStore.ingredientPagination.perPage"
-          :show-total="(total) => `Tổng ${total} nguyên liệu`"
-          show-size-changer
-          @change="handlePageChange"
-        />
-      </div>
     </div>
 
     <!-- Create/Edit Modal -->

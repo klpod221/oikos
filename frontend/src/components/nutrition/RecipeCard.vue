@@ -19,12 +19,13 @@ defineProps({
   recipe: { type: Object, required: true },
 });
 
-defineEmits(["edit", "delete"]);
+defineEmits(["edit", "delete", "view"]);
 </script>
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow"
+    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow cursor-pointer group"
+    @click="$emit('view', recipe)"
   >
     <div class="flex items-start justify-between mb-2 sm:mb-3">
       <div
@@ -33,7 +34,7 @@ defineEmits(["edit", "delete"]);
         <CoffeeOutlined class="text-green-600 text-lg sm:text-xl" />
       </div>
       <a-dropdown>
-        <a-button type="text" size="small">•••</a-button>
+        <a-button type="text" size="small" @click.stop class="opacity-0 group-hover:opacity-100 transition-opacity">•••</a-button>
         <template #overlay>
           <a-menu>
             <a-menu-item @click="$emit('edit', recipe)">
@@ -60,6 +61,7 @@ defineEmits(["edit", "delete"]);
       <span
         >{{ (recipe.prep_time || 0) + (recipe.cooking_time || 0) }} phút</span
       >
+      <span>• {{ recipe.ingredients?.length || 0 }} nguyên liệu</span>
     </div>
     <div v-if="recipe.calories" class="mt-2 text-xs text-slate-400">
       {{ recipe.calories }} kcal | P: {{ recipe.protein }}g | C:

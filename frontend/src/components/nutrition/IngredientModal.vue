@@ -15,6 +15,7 @@
 defineProps({
   open: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
+  ingredient: { type: Object, default: null },
 });
 
 const emit = defineEmits(["update:open", "submit"]);
@@ -41,7 +42,7 @@ const handleOk = () => {
 <template>
   <a-modal
     :open="open"
-    title="Thêm nguyên liệu"
+    :title="ingredient ? 'Chỉnh sửa nguyên liệu' : 'Thêm nguyên liệu'"
     @update:open="emit('update:open', $event)"
     @ok="handleOk"
     :confirm-loading="loading"

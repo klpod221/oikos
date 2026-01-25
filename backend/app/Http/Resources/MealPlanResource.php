@@ -15,6 +15,7 @@ class MealPlanResource extends JsonResource
             'meal_type' => $this->meal_type,
             'description' => $this->description,
             'status' => $this->status,
+            'recipe_id' => $this->recipe_id,
             'recipe' => new RecipeResource($this->whenLoaded('recipe')),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),

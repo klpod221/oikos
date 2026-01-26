@@ -52,7 +52,7 @@ export const useNutritionStore = defineStore("nutrition", () => {
       const res = await nutritionService.getIngredients(
         ingredientFilters.value,
         page,
-        ingredientPagination.value.perPage
+        ingredientPagination.value.perPage,
       );
       ingredients.value = res.data.data || [];
       if (res.data.meta) {
@@ -113,7 +113,7 @@ export const useNutritionStore = defineStore("nutrition", () => {
       const res = await nutritionService.getRecipes(
         recipeFilters.value,
         page,
-        recipePagination.value.perPage
+        recipePagination.value.perPage,
       );
       recipes.value = res.data.data || [];
       if (res.data.meta) {
@@ -134,9 +134,9 @@ export const useNutritionStore = defineStore("nutrition", () => {
   const fetchAllRecipes = async () => {
     try {
       const res = await nutritionService.getRecipes(
-        { sort_by: 'name', sort_order: 'asc' },
+        { sort_by: "name", sort_order: "asc" },
         1,
-        1000 // Fetch all (limit 1000)
+        1000, // Fetch all (limit 1000)
       );
       allRecipes.value = res.data.data || [];
     } catch (e) {
@@ -228,6 +228,92 @@ export const useNutritionStore = defineStore("nutrition", () => {
     }
   };
 
+  // Shopping Lists State
+  const shoppingLists = ref([]);
+  const shoppingListPreview = ref(null);
+
+  // Nutrition Logs State
+  const nutritionLogs = ref([]);
+  const macrosProgress = ref({
+    protein: { current: 0, target: 150, percentage: 0 },
+    carbs: { current: 0, target: 200, percentage: 0 },
+    fat: { current: 0, target: 60, percentage: 0 },
+  });
+
+  // Shopping Lists Actions
+  const previewShoppingList = async (data) => {
+    try {
+      const res = await nutritionService.previewShoppingList(data);
+      shoppingListPreview.value = res.data;
+      return res.data;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Lỗi khi tạo preview");
+      return null;
+    }
+  };
+
+  const createShoppingList = async (data) => {
+    try {
+      await nutritionService.createShoppingList(data);
+      message.success("Đã tạo danh sách mua sắm");
+      await fetchShoppingLists();
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Lỗi khi tạo danh sách");
+      return false;
+    }
+  };
+
+  const fetchShoppingLists = async () => {
+    try {
+      const res = await nutritionService.getShoppingLists();
+      shoppingLists.value = res.data?.data || res.data || [];
+    } catch (e) {
+      console.error("Failed to fetch shopping lists", e);
+    }
+  };
+
+  const updateShoppingListItem = async (listId, itemId, data) => {
+    try {
+      await nutritionService.updateShoppingListItem(listId, itemId, data);
+      await fetchShoppingLists();
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Lỗi khi cập nhật");
+      return false;
+    }
+  };
+
+  // Nutrition Logs Actions
+  const logNutrition = async (data) => {
+    try {
+      await nutritionService.logNutrition(data);
+      message.success("Đã ghi nhận dinh dưỡng");
+      return true;
+    } catch (e) {
+      message.error(e.response?.data?.message || "Lỗi khi ghi nhận");
+      return false;
+    }
+  };
+
+  const fetchNutritionLogs = async (params = {}) => {
+    try {
+      const res = await nutritionService.getNutritionLogs(params);
+      nutritionLogs.value = res.data?.data || res.data || [];
+    } catch (e) {
+      console.error("Failed to fetch nutrition logs", e);
+    }
+  };
+
+  const fetchMacrosProgress = async (date) => {
+    try {
+      const res = await nutritionService.getMacrosProgress({ date });
+      macrosProgress.value = res.data || macrosProgress.value;
+    } catch (e) {
+      console.error("Failed to fetch macros progress", e);
+    }
+  };
+
   return {
     // Ingredient State
     ingredients,
@@ -258,5 +344,20 @@ export const useNutritionStore = defineStore("nutrition", () => {
     createMealPlan,
     updateMealPlan,
     deleteMealPlan,
+
+    // Shopping Lists
+    shoppingLists,
+    shoppingListPreview,
+    previewShoppingList,
+    createShoppingList,
+    fetchShoppingLists,
+    updateShoppingListItem,
+
+    // Nutrition Logs
+    nutritionLogs,
+    macrosProgress,
+    logNutrition,
+    fetchNutritionLogs,
+    fetchMacrosProgress,
   };
 });

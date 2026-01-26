@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
+            UserStatsSeeder::class, // Stats for admin
             SystemCategorySeeder::class,
             WalletSeeder::class,
             TransactionSeeder::class,
@@ -20,6 +21,8 @@ class DatabaseSeeder extends Seeder
             IngredientSeeder::class,
             RecipeSeeder::class,
             MealPlanSeeder::class,
+            ExerciseSeeder::class,
+            RoutineSeeder::class,
         ]);
     }
 }

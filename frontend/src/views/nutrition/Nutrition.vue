@@ -16,6 +16,8 @@ import {
   CoffeeOutlined,
   CalendarOutlined,
   SearchOutlined,
+  ShoppingCartOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons-vue";
 
 // Components
@@ -25,6 +27,8 @@ import RecipeCard from "../../components/nutrition/RecipeCard.vue";
 import RecipeModal from "../../components/nutrition/RecipeModal.vue";
 import RecipeDetailModal from "../../components/nutrition/RecipeDetailModal.vue";
 import MealPlanCalendar from "../../components/nutrition/MealPlanCalendar.vue";
+import ShoppingListCard from "../../components/nutrition/ShoppingListCard.vue";
+import NutritionLogModal from "../../components/nutrition/NutritionLogModal.vue";
 
 import { debounce } from "../../utils/debounce";
 
@@ -38,6 +42,15 @@ const recipeModalOpen = ref(false);
 const recipeDetailModalOpen = ref(false);
 const editingRecipe = ref(null);
 const viewingRecipe = ref(null);
+const nutritionLogModalOpen = ref(false);
+const nutritionLogForm = ref({
+  log_type: "recipe",
+  recipe_id: null,
+  ingredient_id: null,
+  quantity: 1,
+  meal_type: "lunch",
+  logged_at: new Date().toISOString().slice(0, 16),
+});
 
 // Search filters
 const ingredientSearch = ref("");
@@ -68,7 +81,12 @@ const recipeForm = ref({
 });
 
 onMounted(async () => {
-  await Promise.all([nutrition.fetchIngredients(), nutrition.fetchRecipes()]);
+  await Promise.all([
+    nutrition.fetchIngredients(),
+    nutrition.fetchRecipes(),
+    nutrition.fetchShoppingLists(),
+    nutrition.fetchNutritionLogs(),
+  ]);
 });
 
 // Watch ingredient search
@@ -95,7 +113,8 @@ watch(recipeSearch, () => {
 // Ingredient handlers
 const openIngredientModal = (ingredient = null) => {
   // Check if ingredient is a click event or synthetic event
-  const isEvent = ingredient && (ingredient instanceof Event || ingredient.type === 'click');
+  const isEvent =
+    ingredient && (ingredient instanceof Event || ingredient.type === "click");
   const targetIngredient = isEvent ? null : ingredient;
 
   editingIngredient.value = targetIngredient;
@@ -122,13 +141,14 @@ const handleIngredientSubmit = async (data) => {
 };
 
 const handleIngredientDelete = async (id) => {
-    await nutrition.deleteIngredient(id);
+  await nutrition.deleteIngredient(id);
 };
 
 // Recipe handlers
 const openRecipeModal = (recipe = null) => {
   // Check if recipe is a click event
-  const isEvent = recipe && (recipe instanceof Event || recipe.type === 'click');
+  const isEvent =
+    recipe && (recipe instanceof Event || recipe.type === "click");
   const targetRecipe = isEvent ? null : recipe;
 
   editingRecipe.value = targetRecipe;
@@ -181,12 +201,34 @@ const handleRecipePageChange = (page) => {
 const handleIngredientTableChange = (pagination, filters, sorter) => {
   if (sorter.field && sorter.order) {
     nutrition.ingredientFilters.sort_by = sorter.field;
-    nutrition.ingredientFilters.sort_order = sorter.order === "ascend" ? "asc" : "desc";
+    nutrition.ingredientFilters.sort_order =
+      sorter.order === "ascend" ? "asc" : "desc";
   } else {
     nutrition.ingredientFilters.sort_by = "";
     nutrition.ingredientFilters.sort_order = "desc";
   }
   nutrition.fetchIngredients(pagination.current || 1);
+};
+
+// Nutrition Log handlers
+const openNutritionLogModal = () => {
+  nutritionLogForm.value = {
+    log_type: "recipe",
+    recipe_id: null,
+    ingredient_id: null,
+    quantity: 1,
+    meal_type: "lunch",
+    logged_at: new Date().toISOString().slice(0, 16),
+  };
+  nutritionLogModalOpen.value = true;
+};
+
+const handleNutritionLogSubmit = async (data) => {
+  const success = await nutrition.logNutrition(data);
+  if (success) {
+    nutritionLogModalOpen.value = false;
+    await nutrition.fetchNutritionLogs();
+  }
 };
 </script>
 
@@ -265,7 +307,9 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
             Công thức mới
           </a-button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3"
+        >
           <RecipeCard
             v-for="recipe in nutrition.recipes"
             :key="recipe.id"
@@ -279,7 +323,9 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
             class="col-span-full text-center py-12 text-slate-500"
           >
             <CoffeeOutlined class="text-4xl mb-4 opacity-50" />
-            <p class="text-sm">Chưa có công thức. Hãy tạo công thức đầu tiên!</p>
+            <p class="text-sm">
+              Chưa có công thức. Hãy tạo công thức đầu tiên!
+            </p>
           </div>
         </div>
         <div
@@ -303,6 +349,68 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
         >
         <MealPlanCalendar />
       </a-tab-pane>
+
+      <!-- Shopping Lists Tab -->
+      <a-tab-pane key="shopping">
+        <template #tab
+          ><span><ShoppingCartOutlined /> Danh sách mua sắm</span></template
+        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <ShoppingListCard
+            v-for="list in nutrition.shoppingLists"
+            :key="list.id"
+            :list="list"
+          />
+          <div
+            v-if="nutrition.shoppingLists.length === 0"
+            class="col-span-full text-center py-12 text-slate-500"
+          >
+            <ShoppingCartOutlined class="text-4xl mb-4 opacity-50" />
+            <p class="text-sm">Chưa có danh sách mua sắm</p>
+          </div>
+        </div>
+      </a-tab-pane>
+
+      <!-- Nutrition Logs Tab -->
+      <a-tab-pane key="logs">
+        <template #tab
+          ><span><HistoryOutlined /> Nhật ký dinh dưỡng</span></template
+        >
+        <div class="mb-4 flex justify-end">
+          <a-button type="primary" @click="openNutritionLogModal()">
+            <template #icon><PlusOutlined /></template>
+            Ghi nhận
+          </a-button>
+        </div>
+        <div class="space-y-3">
+          <div
+            v-for="log in nutrition.nutritionLogs"
+            :key="log.id"
+            class="bg-white border border-slate-200 rounded-xl p-4"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-medium text-slate-800">
+                  {{ log.recipe?.name || log.ingredient?.name || "Unknown" }}
+                </h4>
+                <p class="text-sm text-slate-500">
+                  {{ log.meal_type }} • {{ log.quantity }} phần
+                </p>
+              </div>
+              <span class="text-xs text-slate-400">{{
+                new Date(log.logged_at).toLocaleDateString("vi-VN")
+              }}</span>
+            </div>
+          </div>
+          <div
+            v-if="nutrition.nutritionLogs.length === 0"
+            class="text-center py-12 text-slate-500"
+          >
+            <HistoryOutlined class="text-4xl mb-4 opacity-50" />
+            <p class="text-sm">Chưa có nhật ký</p>
+          </div>
+        </div>
+      </a-tab-pane>
     </a-tabs>
 
     <!-- Modals -->
@@ -324,6 +432,12 @@ const handleIngredientTableChange = (pagination, filters, sorter) => {
     <RecipeDetailModal
       v-model:open="recipeDetailModalOpen"
       :recipe="viewingRecipe"
+    />
+    <NutritionLogModal
+      v-model:open="nutritionLogModalOpen"
+      v-model:form="nutritionLogForm"
+      :loading="nutrition.loading"
+      @submit="handleNutritionLogSubmit"
     />
   </div>
 </template>

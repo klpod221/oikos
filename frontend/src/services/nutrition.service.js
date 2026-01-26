@@ -32,4 +32,20 @@ export const nutritionService = {
   createMealPlan: (data) => api.post("/meal-plans", data),
   updateMealPlan: (id, data) => api.put(`/meal-plans/${id}`, data),
   deleteMealPlan: (id) => api.delete(`/meal-plans/${id}`),
+
+  // Shopping Lists
+  previewShoppingList: (data) =>
+    api.post("/nutrition/shopping-list/preview", data),
+  createShoppingList: (data) => api.post("/nutrition/shopping-list", data),
+  getShoppingLists: () => api.get("/nutrition/shopping-lists"),
+  updateShoppingListItem: (listId, itemId, data) =>
+    api.patch(`/nutrition/shopping-lists/${listId}/items/${itemId}`, data),
+
+  // Nutrition Logs
+  logNutrition: (data) => api.post("/nutrition/logs", data),
+  getNutritionLogs: (params = {}) => api.get("/nutrition/logs", { params }),
+
+  // Macros Progress
+  getMacrosProgress: (params = {}) =>
+    api.get("/nutrition/macros/progress", { params }),
 };

@@ -33,6 +33,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/workout",
+    name: "Workout",
+    component: () => import("../views/workout/Workout.vue"),
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/settings",
     name: "Settings",
     component: () => import("../views/settings/Settings.vue"),

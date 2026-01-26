@@ -3,3 +3,22 @@
 svg {
   vertical-align: initial;
 }
+
+/* Full screen modal for Workout Player */
+.full-screen-modal .ant-modal {
+  max-width: 100%;
+  top: 0;
+  padding-bottom: 0;
+  margin: 0;
+}
+.full-screen-modal .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-radius: 0;
+}
+.full-screen-modal .ant-modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+}

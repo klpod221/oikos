@@ -83,6 +83,13 @@ Route::middleware(['auth:sanctum', 'user.active'])->group(function () {
         Route::post('/user-goals', [\App\Http\Controllers\Api\Integration\EnergyBalanceController::class, 'updateUserGoals']);
         Route::get('/user-goals', [\App\Http\Controllers\Api\Integration\EnergyBalanceController::class, 'getUserGoals']);
     });
+
+    // AI Chat (RAG + Function Calling + Streaming)
+    Route::prefix('chat')->group(function () {
+        Route::post('/send', [\App\Http\Controllers\Api\ChatController::class, 'send']);
+        Route::get('/history', [\App\Http\Controllers\Api\ChatController::class, 'history']);
+        Route::delete('/clear', [\App\Http\Controllers\Api\ChatController::class, 'clear']);
+    });
 });
 
 // Admin routes

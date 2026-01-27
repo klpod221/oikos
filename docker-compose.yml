@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U oikos -d oikos"]
       interval: 10s
@@ -29,11 +29,21 @@ services:
       timeout: 5s
       retries: 5
 
+  cli-proxy:
+    image: eceasy/cli-proxy-api:latest
+    container_name: oikos_cli_proxy
+    ports:
+      - "8317:8317"
+    volumes:
+      - ./cli-proxy-config.yaml:/CLIProxyAPI/config.yaml
+      - ./cli-proxy-auth:/root/.cli-proxy-api
+    restart: unless-stopped
+
   backend:
     image: oikos-backend:dev
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: oikos_backend
     volumes:
       - ./backend:/var/www/html
@@ -47,22 +57,20 @@ services:
       DB_PASSWORD: secret
       REDIS_HOST: redis
       CACHE_STORE: redis
-    healthcheck:
-      test: ["CMD-SHELL", "php artisan migrate:status"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      OPENAI_API_URL: http://cli-proxy:8317/v1
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy
+        condition: service_started
+      cli-proxy:
+        condition: service_started
 
   frontend:
     image: oikos-frontend:dev
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: oikos_frontend
     volumes:
       - ./frontend:/app
@@ -71,9 +79,52 @@ services:
       VITE_PROXY_TARGET: http://backend:8000
     ports:
       - "5173:5173"
-    depends_on:
-      backend:
-        condition: service_healthy
+
+  # === RAG SERVICES ===
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: oikos_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__LOG_LEVEL: INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tei:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
+    container_name: oikos_tei
+    ports:
+      - "8080:80"
+    volumes:
+      - ./tei_data:/data
+    entrypoint:
+      - text-embeddings-router
+      - --model-id
+      - /data/models/bge-m3
+      - --dtype
+      - float32
+      - --max-client-batch-size
+      - "8"
+      - --max-batch-tokens
+      - "4096"
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   postgres_data:

@@ -9,10 +9,10 @@
         <div
           class="absolute top-6 left-6 flex items-center gap-3 opacity-90 hover:opacity-100 transition-opacity"
         >
-          <img src="/logo.png" alt="Oikos Logo" class="h-10 w-auto" />
+          <img src="/logo.png" alt="OikOS Logo" class="h-10 w-auto" />
           <span
             class="font-bold text-slate-800 text-xl tracking-tight hidden sm:inline-block"
-            >Oikos Workout</span
+            >OikOS Workout</span
           >
         </div>
 

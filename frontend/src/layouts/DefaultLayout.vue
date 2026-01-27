@@ -27,6 +27,7 @@ import {
   TagsOutlined,
   CoffeeOutlined,
   TrophyOutlined,
+  RobotOutlined,
 } from "@ant-design/icons-vue";
 
 const router = useRouter();
@@ -71,6 +72,7 @@ watch(
 
 const menuItems = [
   { key: "/", icon: DashboardOutlined, label: "Tổng quan" },
+  { key: "/chat", icon: RobotOutlined, label: "Trợ lý AI" },
   { key: "/finance", icon: WalletOutlined, label: "Tài chính" },
   { key: "/nutrition", icon: ExperimentOutlined, label: "Dinh dưỡng" },
   { key: "/workout", icon: TrophyOutlined, label: "Tập luyện" },

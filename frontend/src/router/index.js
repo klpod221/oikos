@@ -62,6 +62,12 @@ const routes = [
     component: () => import("../views/admin/Ingredients.vue"),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  {
+    path: "/chat",
+    name: "Chat",
+    component: () => import("../views/chat/Chat.vue"),
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

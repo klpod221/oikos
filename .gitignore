@@ -1,1 +1,24 @@
 .vscode
+.idea
+.env
+.DS_Store
+
+# Data directories
+qdrant_data/
+tei_data/
+postgres_data/
+
+# Logs
+*.log
+npm-debug.log
+
+# Docker
+docker-compose.override.yml
+
+# Node
+node_modules/
+
+# Binaries
+cli-proxy-auth/*
+!cli-proxy-auth/.gitkeep
+cli-proxy-config.yaml

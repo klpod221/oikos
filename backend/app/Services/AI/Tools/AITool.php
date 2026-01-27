@@ -29,6 +29,17 @@ abstract class AITool
     abstract public function execute(array $arguments, int $userId): array;
 
     /**
+     * Get list of other tools this tool may depend on / trigger.
+     * Use this to inform the AI about tool relationships.
+     *
+     * @return array<string> List of tool names
+     */
+    public function dependsOn(): array
+    {
+        return [];
+    }
+
+    /**
      * Get the full tool definition for OpenAI.
      */
     public function getDefinition(): array

@@ -60,7 +60,7 @@ const handleKeydown = (e) => {
         "
       >
         <LoadingOutlined v-if="loading" class="text-lg" />
-        <SendOutlined v-else class="text-lg" />
+        <SendOutlined v-else class="text-lg text-white" />
       </button>
     </div>
     <div class="text-center mt-2 text-xs text-gray-400">

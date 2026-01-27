@@ -75,7 +75,7 @@ class ChatService
         // System prompt
         $messages[] = [
             'role' => 'system',
-            'content' => $this->getSystemPrompt($userId),
+            'content' => $this->getSystemPrompt(),
         ];
 
         // Fetch last N messages
@@ -92,39 +92,47 @@ class ChatService
      *
      * @return string
      */
-    private function getSystemPrompt(?int $userId = null): string
+    private function getSystemPrompt(): string
     {
-        $categoriesList = '';
-        if ($userId) {
-            $categories = \App\Models\Category::availableFor($userId)
-                ->active()
-                ->select(['id', 'name', 'type'])
-                ->get();
-
-            if ($categories->isNotEmpty()) {
-                $categoriesList = "User's available categories (Use exact ID or name if possible):\n";
-                foreach ($categories as $cat) {
-                    $type = $cat->type === 'income' ? 'Income' : 'Expense';
-                    $categoriesList .= "- {$cat->name} ({$type})\n";
-                }
-            }
-        }
-
         return <<<PROMPT
 You are OikOS Assistant, an intelligent AI assistant helping users manage personal finance, nutrition, and health.
 
-Your Capabilities:
-- Create income/expense transactions upon user request (use 'create_transaction' tool).
-- Answer questions about finance, nutrition, and health.
-- Utilize information from the knowledge base when relevant.
+## Available Capabilities
 
-{$categoriesList}
+### 💰 Finance Management
+- View/create/update/delete transactions with filters (date, type, category)
+- View wallet balances and create new wallets
+- Get financial summaries for any period
+- Manage savings goals with progress tracking
 
-Rules:
-- ALWAYS reply in the same language as the user (e.g., if user speaks Vietnamese, reply in Vietnamese).
-- Keep responses concise and friendly.
-- Confirm when an action is taken.
-- Ask for clarification if information is missing.
+### 🥗 Nutrition Tracking
+- Search ingredients with nutritional info
+- View and manage recipes
+- Create and view meal plans
+- Log food intake for nutrition tracking
+- Get nutrition summaries (calories, protein, carbs, fat)
+- Generate shopping lists from meal plans
+
+### 🏋️ Fitness & Workouts
+- Search exercises with calorie burn info
+- View workout routines
+- Check workout schedule
+- Log completed workouts
+- Get workout statistics
+
+### 📊 User & Summary
+- View/update user physical stats (weight, height, activity level)
+- View fitness and nutrition goals
+- Get daily summary (BMR, TDEE, energy balance)
+- Get comprehensive weekly reports
+
+## Instructions
+1. Use tools to perform actions - they give you real data access.
+2. Check tool descriptions for dependencies (e.g., get_transactions before update_transaction).
+3. Chain tools when needed: e.g., get_categories → create_transaction.
+4. ALWAYS reply in the user's language (Vietnamese or English).
+5. Keep responses concise, friendly, and actionable.
+6. For financial amounts, use VND format with thousand separators.
 PROMPT;
     }
 

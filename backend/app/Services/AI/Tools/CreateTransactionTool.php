@@ -24,6 +24,11 @@ class CreateTransactionTool extends AITool
         return 'Create a new financial transaction (income or expense). Use this when the user wants to record a transaction.';
     }
 
+    public function dependsOn(): array
+    {
+        return ['get_categories'];
+    }
+
     public function parameters(): array
     {
         return [
@@ -46,6 +51,14 @@ class CreateTransactionTool extends AITool
                     'type' => 'string',
                     'description' => 'Category name (e.g., Food, Travel). Optional if not explicitly mentioned.',
                 ],
+                'wallet' => [
+                    'type' => 'string',
+                    'description' => 'Wallet name to use (optional, uses default if not specified)',
+                ],
+                'date' => [
+                    'type' => 'string',
+                    'description' => 'Transaction date in YYYY-MM-DD format (optional, uses today if not specified)',
+                ],
             ],
             'required' => ['amount', 'type'],
         ];
@@ -58,30 +71,32 @@ class CreateTransactionTool extends AITool
             $type = $arguments['type'] ?? 'expense';
             $note = $arguments['note'] ?? '';
             $categoryName = $arguments['category'] ?? null;
+            $walletName = $arguments['wallet'] ?? null;
+            $date = $arguments['date'] ?? now()->toDateString();
 
             if ($amount <= 0) {
                 return [
                     'success' => false,
-                    'result' => 'Số tiền phải lớn hơn 0',
+                    'result' => 'Amount must be greater than 0',
                 ];
             }
 
-            // Get default wallet
-            $wallet = \App\Models\Wallet::where('user_id', $userId)->first();
+            // Resolve wallet
+            $wallet = $this->resolveWallet($userId, $walletName);
             if (!$wallet) {
                 return [
                     'success' => false,
-                    'result' => 'Bạn chưa có ví tiền. Vui lòng tạo ví trước khi ghi giao dịch.',
+                    'result' => 'User has no wallet',
                 ];
             }
 
             // Resolve category
-            $categoryId = $this->resolveCategory($userId, $type, $categoryName); // Removed $note
+            $categoryId = $this->resolveCategory($userId, $type, $categoryName);
 
             if (!$categoryId) {
                 return [
                     'success' => false,
-                    'result' => 'Không tìm thấy danh mục phù hợp. Vui lòng thử lại.',
+                    'result' => 'Category not found. Please try again.',
                 ];
             }
 
@@ -92,10 +107,10 @@ class CreateTransactionTool extends AITool
                 'amount' => $amount,
                 'type' => $type,
                 'description' => $note,
-                'transaction_date' => now()->toDateString(),
+                'transaction_date' => $date,
             ]);
 
-            $typeLabel = $type === 'income' ? 'thu nhập' : 'chi tiêu';
+            $typeLabel = $type === 'income' ? 'income' : 'expense';
             $formattedAmount = number_format($amount, 0, ',', '.');
 
             // Fetch category name for clearer response
@@ -104,7 +119,7 @@ class CreateTransactionTool extends AITool
 
             return [
                 'success' => true,
-                'result' => "Đã tạo giao dịch {$typeLabel} {$formattedAmount}đ vào mục '{$catName}'" . ($note ? " (Ghi chú: {$note})" : ''),
+                'result' => "Created {$typeLabel} transaction for {$formattedAmount}đ into category '{$catName}'" . ($note ? " (Note: {$note})" : ''),
                 'data' => $transaction,
             ];
         } catch (\Exception $e) {
@@ -115,7 +130,7 @@ class CreateTransactionTool extends AITool
 
             return [
                 'success' => false,
-                'result' => 'Không thể tạo giao dịch: ' . $e->getMessage(),
+                'result' => 'Failed to create transaction: ' . $e->getMessage(),
             ];
         }
     }
@@ -129,7 +144,6 @@ class CreateTransactionTool extends AITool
             ->where('type', $type)
             ->where('is_active', true);
 
-        // 1. Precise match if name provided
         if ($name) {
             $cat = (clone $query)->where('name', 'like', "%{$name}%")->first();
             if ($cat) {
@@ -137,10 +151,6 @@ class CreateTransactionTool extends AITool
             }
         }
 
-        // 2. Fuzzy match from note if no name
-        // (Simplified for now, similar to previous logic)
-
-        // 3. Find "General" or "Other" category as fallback
         $fallback = (clone $query)->where(function ($q) {
             $q->where('name', 'like', '%Khác%')
                 ->orWhere('name', 'like', '%General%')
@@ -151,8 +161,26 @@ class CreateTransactionTool extends AITool
             return $fallback->id;
         }
 
-        // 4. Any first category of that type
         $any = $query->first();
         return $any ? $any->id : null;
+    }
+
+    /**
+     * Resolve wallet by name or get default.
+     */
+    private function resolveWallet(int $userId, ?string $name): ?\App\Models\Wallet
+    {
+        $query = \App\Models\Wallet::where('user_id', $userId);
+
+        if ($name) {
+            $wallet = (clone $query)->where('name', 'like', "%{$name}%")->first();
+            if ($wallet) {
+                return $wallet;
+            }
+        }
+
+        // Fall back to default wallet or first wallet
+        return $query->where('is_default', true)->first()
+            ?? $query->first();
     }
 }

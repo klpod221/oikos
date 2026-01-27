@@ -6,7 +6,7 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons-vue";
 import { Popconfirm } from "ant-design-vue";
-import { useChatStore } from "../../../stores/chat";
+import { useChatStore } from "../../stores/chat";
 
 // Components
 import MessageItem from "./MessageItem.vue";

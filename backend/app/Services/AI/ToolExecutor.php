@@ -3,7 +3,40 @@
 namespace App\Services\AI;
 
 use App\Services\AI\Tools\AITool;
+// Finance Tools
+use App\Services\AI\Tools\GetCategoriesTool;
 use App\Services\AI\Tools\CreateTransactionTool;
+use App\Services\AI\Tools\GetTransactionsTool;
+use App\Services\AI\Tools\UpdateTransactionTool;
+use App\Services\AI\Tools\DeleteTransactionTool;
+use App\Services\AI\Tools\GetWalletsTool;
+use App\Services\AI\Tools\CreateWalletTool;
+use App\Services\AI\Tools\GetFinancialSummaryTool;
+use App\Services\AI\Tools\GetSavingsGoalsTool;
+use App\Services\AI\Tools\CreateSavingsGoalTool;
+use App\Services\AI\Tools\UpdateSavingsGoalTool;
+// Nutrition Tools
+use App\Services\AI\Tools\GetIngredientsTool;
+use App\Services\AI\Tools\GetRecipesTool;
+use App\Services\AI\Tools\GetMealPlansTool;
+use App\Services\AI\Tools\CreateMealPlanTool;
+use App\Services\AI\Tools\LogNutritionTool;
+use App\Services\AI\Tools\GetNutritionSummaryTool;
+use App\Services\AI\Tools\GetShoppingListTool;
+use App\Services\AI\Tools\GenerateShoppingListTool;
+// Workout Tools
+use App\Services\AI\Tools\GetExercisesTool;
+use App\Services\AI\Tools\GetRoutinesTool;
+use App\Services\AI\Tools\GetWorkoutScheduleTool;
+use App\Services\AI\Tools\LogWorkoutTool;
+use App\Services\AI\Tools\GetWorkoutSummaryTool;
+// User Tools
+use App\Services\AI\Tools\GetDailySummaryTool;
+use App\Services\AI\Tools\GetUserGoalsTool;
+use App\Services\AI\Tools\GetUserStatsTool;
+use App\Services\AI\Tools\UpdateUserStatsTool;
+use App\Services\AI\Tools\GetWeeklyReportTool;
+// Services
 use App\Services\Finance\TransactionService;
 use Illuminate\Support\Facades\Log;
 
@@ -18,8 +51,42 @@ class ToolExecutor
 
     public function __construct(TransactionService $transactionService)
     {
-        // Register default tools
+        // Finance Tools
+        $this->register(new GetCategoriesTool());
         $this->register(new CreateTransactionTool($transactionService));
+        $this->register(new GetTransactionsTool());
+        $this->register(new UpdateTransactionTool());
+        $this->register(new DeleteTransactionTool($transactionService));
+        $this->register(new GetWalletsTool());
+        $this->register(new CreateWalletTool());
+        $this->register(new GetFinancialSummaryTool());
+        $this->register(new GetSavingsGoalsTool());
+        $this->register(new CreateSavingsGoalTool());
+        $this->register(new UpdateSavingsGoalTool());
+
+        // Nutrition Tools
+        $this->register(new GetIngredientsTool());
+        $this->register(new GetRecipesTool());
+        $this->register(new GetMealPlansTool());
+        $this->register(new CreateMealPlanTool());
+        $this->register(new LogNutritionTool());
+        $this->register(new GetNutritionSummaryTool());
+        $this->register(new GetShoppingListTool());
+        $this->register(new GenerateShoppingListTool());
+
+        // Workout Tools
+        $this->register(new GetExercisesTool());
+        $this->register(new GetRoutinesTool());
+        $this->register(new GetWorkoutScheduleTool());
+        $this->register(new LogWorkoutTool());
+        $this->register(new GetWorkoutSummaryTool());
+
+        // User & Summary Tools
+        $this->register(new GetDailySummaryTool());
+        $this->register(new GetUserGoalsTool());
+        $this->register(new GetUserStatsTool());
+        $this->register(new UpdateUserStatsTool());
+        $this->register(new GetWeeklyReportTool());
     }
 
     /**
@@ -39,7 +106,15 @@ class ToolExecutor
     {
         $definitions = [];
         foreach ($this->tools as $tool) {
-            $definitions[] = $tool->getDefinition();
+            $def = $tool->getDefinition();
+            $dependencies = $tool->dependsOn();
+
+            if (!empty($dependencies)) {
+                $depString = implode(', ', $dependencies);
+                $def['function']['description'] .= " (Relies on tools/functions: {$depString})";
+            }
+
+            $definitions[] = $def;
         }
         return $definitions;
     }

@@ -4,7 +4,7 @@ import { UserOutlined, RobotOutlined } from "@ant-design/icons-vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
-import { useAuthStore } from "../../../stores/auth";
+import { useAuthStore } from "../../stores/auth";
 
 const props = defineProps({
   msg: Object,
@@ -50,7 +50,7 @@ const formatTime = (isoString) => {
     :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'"
   >
     <!-- Avatar -->
-    <div class="flex-shrink-0 mt-1">
+    <div class="shrink-0 mt-1">
       <div
         v-if="msg.role === 'assistant'"
         class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-sm"
@@ -91,20 +91,57 @@ const formatTime = (isoString) => {
         <!-- Assistant Message (Markdown) -->
         <div
           v-if="msg.role === 'assistant'"
-          class="prose prose-sm max-w-none break-words dark:prose-invert"
+          class="prose prose-sm max-w-none wrap-break-word dark:prose-invert"
           v-html="md.render(msg.content)"
         ></div>
 
         <!-- User Message (Text) -->
-        <div v-else class="whitespace-pre-wrap break-words">
+        <div v-else class="whitespace-pre-wrap wrap-break-word">
           {{ msg.content }}
         </div>
 
-        <!-- Streaming Indicator -->
-        <div v-if="msg.isStreaming" class="mt-2 text-gray-400 animate-pulse">
-          ●
+        <!-- Streaming Indicator - Typing dots -->
+        <div v-if="msg.isStreaming" class="flex items-center gap-1 mt-2">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #9ca3af;
+  border-radius: 50%;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+@keyframes typing-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+</style>

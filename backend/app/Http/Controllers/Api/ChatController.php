@@ -99,7 +99,17 @@ class ChatController extends Controller
         $limit = $request->input('limit', 10);
         $userId = $request->user()->id;
 
+        $search = $request->input('search');
+
         $paginator = \App\Models\ChatHistory::where('user_id', $userId)
+            ->whereNotIn('role', ['tool', 'system'])
+            ->where(function ($query) {
+                $query->whereNotNull('content')
+                    ->where('content', '!=', '');
+            })
+            ->when($search, function ($query, $search) {
+                return $query->where('content', 'like', "%{$search}%");
+            })
             ->orderBy('id', 'desc')
             ->paginate($limit);
 

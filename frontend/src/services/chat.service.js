@@ -71,7 +71,7 @@ export const chatService = {
 
   async getHistory(params = {}) {
     const { default: api } = await import("../utils/axios");
-    // Ensure we pass page if standard pagination is used
+    // Params can include: page, limit, search
     return (await api.get("/chat/history", { params })).data;
   },
 

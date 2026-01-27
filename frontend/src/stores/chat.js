@@ -117,6 +117,11 @@ export const useChatStore = defineStore("chat", () => {
     }
   }
 
+  async function clearHistory() {
+    await chatService.clearHistory();
+    messages.value = [];
+  }
+
   return {
     messages,
     isStreaming,
@@ -125,5 +130,7 @@ export const useChatStore = defineStore("chat", () => {
     hasMore, // Added
     loadHistory,
     sendMessage,
+    clearHistory,
+    getService: () => chatService,
   };
 });

@@ -75,7 +75,7 @@ class ChatService
         // System prompt
         $messages[] = [
             'role' => 'system',
-            'content' => $this->getSystemPrompt(),
+            'content' => $this->getSystemPrompt($userId),
         ];
 
         // Fetch last N messages
@@ -92,21 +92,39 @@ class ChatService
      *
      * @return string
      */
-    private function getSystemPrompt(): string
+    private function getSystemPrompt(?int $userId = null): string
     {
+        $categoriesList = '';
+        if ($userId) {
+            $categories = \App\Models\Category::availableFor($userId)
+                ->active()
+                ->select(['id', 'name', 'type'])
+                ->get();
+
+            if ($categories->isNotEmpty()) {
+                $categoriesList = "User's available categories (Use exact ID or name if possible):\n";
+                foreach ($categories as $cat) {
+                    $type = $cat->type === 'income' ? 'Income' : 'Expense';
+                    $categoriesList .= "- {$cat->name} ({$type})\n";
+                }
+            }
+        }
+
         return <<<PROMPT
-Bạn là OikOS Assistant, trợ lý AI thông minh giúp người dùng quản lý tài chính cá nhân, dinh dưỡng và sức khỏe.
+You are OikOS Assistant, an intelligent AI assistant helping users manage personal finance, nutrition, and health.
 
-Khả năng của bạn:
-- Tạo giao dịch thu/chi khi người dùng yêu cầu (sử dụng tool create_transaction)
-- Trả lời câu hỏi về tài chính, dinh dưỡng, và sức khỏe
-- Sử dụng thông tin từ knowledge base khi có liên quan
+Your Capabilities:
+- Create income/expense transactions upon user request (use 'create_transaction' tool).
+- Answer questions about finance, nutrition, and health.
+- Utilize information from the knowledge base when relevant.
 
-Quy tắc:
-- Trả lời bằng tiếng Việt
-- Ngắn gọn, thân thiện
-- Xác nhận khi thực hiện hành động
-- Hỏi lại nếu thông tin không đủ
+{$categoriesList}
+
+Rules:
+- ALWAYS reply in the same language as the user (e.g., if user speaks Vietnamese, reply in Vietnamese).
+- Keep responses concise and friendly.
+- Confirm when an action is taken.
+- Ask for clarification if information is missing.
 PROMPT;
     }
 

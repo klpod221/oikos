@@ -1,52 +1,26 @@
 <script setup>
-import { ref, onMounted, nextTick, watch, computed } from "vue";
+import { ref, onMounted, nextTick, watch } from "vue";
 import {
-  SendOutlined,
   LoadingOutlined,
-  UserOutlined,
-  RobotOutlined,
+  SearchOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons-vue";
+import { Popconfirm } from "ant-design-vue";
 import { useChatStore } from "../../../stores/chat";
-import MarkdownIt from "markdown-it";
-import hljs from "highlight.js";
-import "highlight.js/styles/github-dark.css";
+
+// Components
+import MessageItem from "./MessageItem.vue";
+import ChatInput from "./ChatInput.vue";
+import SearchMessageModal from "./SearchMessageModal.vue";
 
 const store = useChatStore();
-const input = ref("");
+const showSearchModal = ref(false);
 const messagesContainer = ref(null);
-const textareaRef = ref(null);
 const topSentinel = ref(null);
-let observer = null;
-
-// Configure MarkdownIt with highlight.js
-const md = new MarkdownIt({
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return (
-          '<pre class="hljs"><code>' +
-          hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
-          "</code></pre>"
-        );
-      } catch (__) {}
-    }
-    return (
-      '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + "</code></pre>"
-    );
-  },
-});
-
-// State
-const showScrollButton = ref(false);
 const userScrolledUp = ref(false);
-
-// Auto-expand textarea
-const adjustTextareaHeight = () => {
-  const el = textareaRef.value;
-  if (!el) return;
-  el.style.height = "auto";
-  el.style.height = Math.min(el.scrollHeight, 150) + "px";
-};
+const showScrollButton = ref(false); // Restore state
+let observer = null;
+// Markdown logic moved to MessageItem
 
 // Scroll Logic
 const scrollToBottom = async (force = false, behavior = "smooth") => {
@@ -142,25 +116,55 @@ onMounted(async () => {
   }, 100);
 });
 
-const handleSend = () => {
-  if (!input.value.trim() || store.isStreaming) return;
-  store.sendMessage(input.value);
-  input.value = "";
-  adjustTextareaHeight(); // Reset height
-  userScrolledUp.value = false; // Reset scroll lock
-  setTimeout(() => scrollToBottom(true, "auto"), 100);
+// Search Logic
+const openSearch = () => {
+  showSearchModal.value = true;
 };
 
-const handleKeydown = (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    handleSend();
-  }
+// Clear History Logic
+const confirmClearHistory = async () => {
+  await store.clearHistory();
+  // store.messages logic moved to store action
+};
+
+const handleSend = async (content) => {
+  store.sendMessage(content);
+  userScrolledUp.value = false;
+  setTimeout(() => scrollToBottom(true, "auto"), 100);
 };
 </script>
 
 <template>
   <div class="flex flex-col h-full bg-white relative">
+    <!-- Header with Actions -->
+    <!-- Queue Header Actions -->
+    <div class="absolute top-4 right-4 z-20 flex gap-2">
+      <button
+        @click="openSearch"
+        class="w-8 h-8 rounded-full bg-white text-gray-500 hover:text-blue-600 shadow-sm border border-gray-200 flex items-center justify-center transition-all"
+        title="Tìm kiếm"
+      >
+        <SearchOutlined />
+      </button>
+
+      <Popconfirm
+        title="Bạn có chắc chắn muốn xóa toàn bộ lịch sử?"
+        ok-text="Xóa"
+        cancel-text="Hủy"
+        @confirm="confirmClearHistory"
+      >
+        <button
+          class="w-8 h-8 rounded-full bg-white text-gray-500 hover:text-red-600 shadow-sm border border-gray-200 flex items-center justify-center transition-all"
+          title="Xóa lịch sử"
+        >
+          <DeleteOutlined />
+        </button>
+      </Popconfirm>
+    </div>
+
+    <!-- Search Modal -->
+    <SearchMessageModal v-model:open="showSearchModal" :store="store" />
+
     <!-- Messages Area -->
     <div
       ref="messagesContainer"
@@ -179,67 +183,11 @@ const handleKeydown = (e) => {
       </div>
 
       <div class="max-w-3xl mx-auto space-y-6">
-        <div
+        <MessageItem
           v-for="(msg, index) in store.messages"
           :key="msg.id || index"
-          class="flex gap-4"
-          :class="msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'"
-        >
-          <!-- Avatar -->
-          <div class="flex-shrink-0 mt-1">
-            <div
-              v-if="msg.role === 'assistant'"
-              class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-sm"
-            >
-              <RobotOutlined />
-            </div>
-            <div
-              v-else
-              class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white shadow-sm"
-            >
-              <UserOutlined />
-            </div>
-          </div>
-
-          <!-- Content Bubble -->
-          <div class="flex flex-col max-w-[85%]">
-            <div
-              class="font-medium text-xs text-gray-400 mb-1 px-1"
-              :class="msg.role === 'user' ? 'text-right' : 'text-left'"
-            >
-              {{ msg.role === "user" ? "Bạn" : "OikOS Assistant" }}
-            </div>
-
-            <div
-              class="rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm"
-              :class="[
-                msg.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-tr-sm'
-                  : 'bg-gray-100 text-gray-800 rounded-tl-sm border border-gray-200',
-              ]"
-            >
-              <!-- Assistant Message (Markdown) -->
-              <div
-                v-if="msg.role === 'assistant'"
-                class="prose prose-sm max-w-none break-words dark:prose-invert"
-                v-html="md.render(msg.content)"
-              ></div>
-
-              <!-- User Message (Text) -->
-              <div v-else class="whitespace-pre-wrap break-words">
-                {{ msg.content }}
-              </div>
-
-              <!-- Streaming Indicator -->
-              <div
-                v-if="msg.isStreaming"
-                class="mt-2 text-gray-400 animate-pulse"
-              >
-                ●
-              </div>
-            </div>
-          </div>
-        </div>
+          :msg="msg"
+        />
       </div>
 
       <!-- Bottom spacing -->
@@ -268,39 +216,7 @@ const handleKeydown = (e) => {
     </button>
 
     <!-- Input Area -->
-    <div class="border-t border-gray-200 p-4 bg-white/95 backdrop-blur-sm">
-      <div
-        class="max-w-3xl mx-auto relative rounded-xl border border-gray-300 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 bg-white transition-all"
-      >
-        <textarea
-          ref="textareaRef"
-          v-model="input"
-          @keydown="handleKeydown"
-          @input="adjustTextareaHeight"
-          placeholder="Nhập tin nhắn... (Shift+Enter xuống dòng)"
-          class="w-full py-3 pl-4 pr-12 bg-transparent border-none rounded-xl focus:ring-0 resize-none max-h-[150px] min-h-[50px] overflow-y-auto outline-none"
-          :disabled="store.isStreaming"
-          rows="1"
-        ></textarea>
-
-        <button
-          @click="handleSend"
-          :disabled="!input.trim() || store.isStreaming"
-          class="absolute bottom-2 right-2 p-1.5 rounded-lg text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          :class="
-            !input.trim() || store.isStreaming
-              ? 'bg-gray-300'
-              : 'bg-blue-600 hover:bg-blue-700'
-          "
-        >
-          <LoadingOutlined v-if="store.isStreaming" class="text-lg" />
-          <SendOutlined v-else class="text-lg" />
-        </button>
-      </div>
-      <div class="text-center mt-2 text-xs text-gray-400">
-        OikOS AI có thể mắc sai sót. Hãy kiểm tra lại thông tin quan trọng.
-      </div>
-    </div>
+    <ChatInput :loading="store.isStreaming" @send="handleSend" />
   </div>
 </template>
 
@@ -329,52 +245,5 @@ const handleKeydown = (e) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-</style>
-
-<style>
-/* Markdown Content Styles - Enhanced with Typography */
-.prose p {
-  margin-bottom: 0.8em;
-}
-.prose p:last-child {
-  margin-bottom: 0;
-}
-.prose h1,
-.prose h2,
-.prose h3 {
-  margin-top: 1em;
-  font-weight: 600;
-}
-.prose ul,
-.prose ol {
-  padding-left: 1.25em;
-  margin-bottom: 0.8em;
-}
-.prose ul {
-  list-style-type: disc;
-}
-.prose ol {
-  list-style-type: decimal;
-}
-.prose code {
-  background-color: rgba(0, 0, 0, 0.06);
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
-  color: #e11d48;
-}
-.prose pre {
-  background-color: #1f2937;
-  padding: 0.75em;
-  border-radius: 8px;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-}
-.prose pre code {
-  background-color: transparent;
-  padding: 0;
-  color: #f3f4f6;
-  font-size: 0.9em;
 }
 </style>

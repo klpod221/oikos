@@ -37,7 +37,9 @@ class ChatController extends Controller
 
         return new StreamedResponse(function () use ($userId, $message) {
             // Disable output buffering
-            if (ob_get_level()) ob_end_clean();
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
 
             // Force flush
             ob_implicit_flush(true);
@@ -94,13 +96,15 @@ class ChatController extends Controller
      */
     public function history(Request $request)
     {
-        $limit = $request->input('limit', 50);
+        $limit = $request->input('limit', 10);
         $userId = $request->user()->id;
 
-        $messages = \App\Models\ChatHistory::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get()
+        $paginator = \App\Models\ChatHistory::where('user_id', $userId)
+            ->orderBy('id', 'desc')
+            ->paginate($limit);
+
+        // Transform collection but keep pagination meta
+        $messages = collect($paginator->items())
             ->reverse()
             ->values()
             ->map(fn($m) => [
@@ -111,7 +115,15 @@ class ChatController extends Controller
             ]);
 
         return response()->json([
-            'messages' => $messages,
+            'success' => true,
+            'data' => $messages,
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+            'has_more' => $paginator->hasMorePages(), // Keep for backward compat if needed, standard is checking current < last
         ]);
     }
 

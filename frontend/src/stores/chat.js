@@ -4,36 +4,76 @@ import { chatService } from "../services/chat.service";
 import { useAuthStore } from "./auth";
 
 export const useChatStore = defineStore("chat", () => {
-  const messages = ref([
-    {
-      role: "assistant",
-      content: "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
-    },
-  ]);
+  const messages = ref([]);
   const isStreaming = ref(false);
   const isLoading = ref(false);
+  const isLoadingMore = ref(false);
+  const hasMore = ref(true);
   const auth = useAuthStore();
 
-  async function loadHistory() {
-    isLoading.value = true;
+  const currentPage = ref(1);
+
+  async function loadHistory(loadMore = false) {
+    if (loadMore) {
+      if (isLoadingMore.value || !hasMore.value) return;
+      isLoadingMore.value = true;
+    } else {
+      isLoading.value = true;
+      messages.value = []; // Reset on fresh load
+      hasMore.value = true;
+      currentPage.value = 1;
+    }
+
     try {
-      const data = await chatService.getHistory();
-      if (data.messages) {
-        // Convert API messages to UI format
-        const history = data.messages.map((msg) => ({
+      // Use page parameter
+      const params = {
+        limit: 10,
+        page: loadMore ? currentPage.value + 1 : 1,
+      };
+
+      const response = await chatService.getHistory(params);
+      const data = response.data || [];
+      const meta = response.meta;
+
+      if (Array.isArray(data)) {
+        const history = data.map((msg) => ({
+          id: msg.id,
           role: msg.role,
           content: msg.content,
         }));
 
-        // If history is empty, keep the welcome message, otherwise replace
-        if (history.length > 0) {
-          messages.value = history;
+        // Update pagination state
+        if (meta) {
+          currentPage.value = meta.current_page;
+          hasMore.value = meta.current_page < meta.last_page;
+        } else {
+          // Fallback if meta is missing
+          hasMore.value = response.has_more ?? false;
+        }
+
+        if (loadMore) {
+          messages.value = [...history, ...messages.value];
+        } else {
+          // If fresh load and empty, add welcome message
+          if (history.length === 0) {
+            messages.value = [
+              {
+                id: "welcome",
+                role: "assistant",
+                content: "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
+              },
+            ];
+            hasMore.value = false;
+          } else {
+            messages.value = history;
+          }
         }
       }
     } catch (error) {
       console.error(error);
     } finally {
       isLoading.value = false;
+      isLoadingMore.value = false;
     }
   }
 
@@ -81,6 +121,8 @@ export const useChatStore = defineStore("chat", () => {
     messages,
     isStreaming,
     isLoading,
+    isLoadingMore, // Added
+    hasMore, // Added
     loadHistory,
     sendMessage,
   };

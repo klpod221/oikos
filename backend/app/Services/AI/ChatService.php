@@ -186,21 +186,71 @@ PROMPT;
 
         while ($iteration < $maxIterations) {
             $iteration++;
-            $shouldStream = false; // Disable streaming to ensure tool calls are captured
-            $response = $this->callCompletionAPI($messages, $shouldStream);
+            // Enable streaming
+            $response = $this->callCompletionAPI($messages, true);
+            $stream = $response['stream'];
 
-            // Handle tool calls
-            if (!empty($response['tool_calls'])) {
-                $this->saveMessage($userId, 'assistant', $response['content'] ?? '', [
-                    'tool_calls' => $response['tool_calls'],
-                ]);
+            $accumulatedContent = '';
+            $accumulatedToolCalls = [];
 
-                $toolResults = $this->executeToolCalls($response['tool_calls'], $userId);
+            foreach ($stream as $chunk) {
+                // Handle content
+                if (!empty($chunk['content'])) {
+                    $accumulatedContent .= $chunk['content'];
+                    yield ['type' => 'content', 'content' => $chunk['content']];
+                }
+
+                // Handle tool calls
+                if (!empty($chunk['tool_calls'])) {
+                    foreach ($chunk['tool_calls'] as $toolCallDelta) {
+                        $index = $toolCallDelta['index'];
+
+                        if (!isset($accumulatedToolCalls[$index])) {
+                            $accumulatedToolCalls[$index] = [
+                                'id' => $toolCallDelta['id'] ?? null,
+                                'type' => $toolCallDelta['type'] ?? 'function',
+                                'function' => [
+                                    'name' => $toolCallDelta['function']['name'] ?? '',
+                                    'arguments' => '',
+                                ]
+                            ];
+                        }
+
+                        if (isset($toolCallDelta['function']['arguments'])) {
+                            $accumulatedToolCalls[$index]['function']['arguments'] .= $toolCallDelta['function']['arguments'];
+                        }
+                    }
+                }
+            }
+
+            // If no content and no tool calls, skip (shouldn't happen unless empty stream)
+            if (empty($accumulatedContent) && empty($accumulatedToolCalls)) {
+                yield ['type' => 'done'];
+                break;
+            }
+
+            // Prepare tool calls array
+            $toolCalls = [];
+            if (!empty($accumulatedToolCalls)) {
+                $toolCalls = array_values($accumulatedToolCalls);
+            }
+
+            // Save assistant message to DB (combining content and tool calls)
+            $metadata = [];
+            if (!empty($toolCalls)) {
+                $metadata['tool_calls'] = $toolCalls;
+            }
+            $this->saveMessage($userId, 'assistant', $accumulatedContent, $metadata);
+
+            // If we have tool calls, process them and loop
+            if (!empty($toolCalls)) {
                 $messages[] = [
                     'role' => 'assistant',
-                    'content' => $response['content'] ?? null,
-                    'tool_calls' => $response['tool_calls'],
+                    'content' => !empty($accumulatedContent) ? $accumulatedContent : null,
+                    'tool_calls' => $toolCalls,
                 ];
+
+                $toolResults = $this->executeToolCalls($toolCalls, $userId);
 
                 foreach ($toolResults as $result) {
                     $messages[] = [
@@ -216,19 +266,6 @@ PROMPT;
                 continue;
             }
 
-            // Stream or return content
-            $fullContent = '';
-            if (isset($response['stream'])) {
-                foreach ($response['stream'] as $chunk) {
-                    $fullContent .= $chunk;
-                    yield ['type' => 'content', 'content' => $chunk];
-                }
-            } else {
-                $fullContent = $response['content'] ?? '';
-                yield ['type' => 'content', 'content' => $fullContent];
-            }
-
-            $this->saveMessage($userId, 'assistant', $fullContent);
             yield ['type' => 'done'];
             break;
         }
@@ -267,6 +304,7 @@ PROMPT;
     private function fetchCompletion(array $payload): array
     {
         try {
+            /** @var Response $response */
             $response = Http::timeout(60)
                 ->withHeaders([
                     'Authorization' => "Bearer {$this->apiKey}",
@@ -304,6 +342,42 @@ PROMPT;
      */
     private function streamFromAPI(array $payload): Generator
     {
+        $stream = $this->openStreamConnection($payload);
+
+        if (!$stream) {
+            yield 'Xin lỗi, không thể kết nối đến AI.';
+            return;
+        }
+
+        try {
+            $buffer = '';
+            while (!feof($stream)) {
+                $chunk = fread($stream, 1024);
+                if ($chunk === false) {
+                    break;
+                }
+
+                $buffer .= $chunk;
+                $status = yield from $this->processBuffer($buffer);
+
+
+                if ($status === false) {
+                    break;
+                }
+            }
+        } finally {
+            fclose($stream);
+        }
+    }
+
+    /**
+     * Open stream connection.
+     *
+     * @param array $payload
+     * @return resource|null
+     */
+    private function openStreamConnection(array $payload)
+    {
         $url = "{$this->apiUrl}/chat/completions";
         $headers = [
             "Content-Type: application/json",
@@ -325,46 +399,45 @@ PROMPT;
 
         if (!$stream) {
             Log::error('Stream API connection failed');
-            yield 'Xin lỗi, không thể kết nối đến AI.';
-            return;
+            return null;
         }
 
         if (!$this->checkStreamStatus($stream)) {
-            yield 'Xin lỗi, đã có lỗi xảy ra.';
             fclose($stream);
-            return;
+            return null;
         }
 
-        $buffer = '';
-        while (!feof($stream)) {
-            $chunk = fread($stream, 1024);
-            if ($chunk === false) {
-                break;
+        return $stream;
+    }
+
+    /**
+     * Process buffer and yield lines.
+     *
+     * @param string $buffer
+     * @return Generator<string, mixed, mixed, bool> Returns false if stream should stop
+     */
+    private function processBuffer(string &$buffer): Generator
+    {
+        while (($newlinePos = strpos($buffer, "\n")) !== false) {
+            $line = substr($buffer, 0, $newlinePos);
+            $buffer = substr($buffer, $newlinePos + 1);
+            $line = trim($line);
+
+            if (empty($line)) {
+                continue;
             }
 
-            $buffer .= $chunk;
+            $content = $this->parseStreamLine($line);
+            if ($content === false) {
+                return false;
+            }
 
-            while (($newlinePos = strpos($buffer, "\n")) !== false) {
-                $line = substr($buffer, 0, $newlinePos);
-                $buffer = substr($buffer, $newlinePos + 1);
-                $line = trim($line);
-
-                if (empty($line)) {
-                    continue;
-                }
-
-                $content = $this->parseStreamLine($line);
-                if ($content === false) {
-                    break 2; // [DONE]
-                }
-
-                if ($content !== null) {
-                    yield $content;
-                }
+            if ($content !== null) {
+                yield $content;
             }
         }
 
-        fclose($stream);
+        return true;
     }
 
     /**
@@ -386,11 +459,11 @@ PROMPT;
     /**
      * Parse a single line from SSE stream.
      * Returns:
-     * - string: Content chunk
+     * - array: ['content' => ..., 'tool_calls' => ...]
      * - null: Continue/Ignore
      * - false: Stop stream ([DONE])
      */
-    private function parseStreamLine(string $line): string|null|bool
+    private function parseStreamLine(string $line): array|null|bool
     {
         if (!str_starts_with($line, 'data: ')) {
             return null;
@@ -402,11 +475,12 @@ PROMPT;
         }
 
         $data = json_decode($json, true);
-        if (isset($data['choices'][0]['delta']['content'])) {
-            return $data['choices'][0]['delta']['content'];
-        }
+        $delta = $data['choices'][0]['delta'] ?? [];
 
-        return null;
+        return [
+            'content' => $delta['content'] ?? null,
+            'tool_calls' => $delta['tool_calls'] ?? null,
+        ];
     }
 
     /**

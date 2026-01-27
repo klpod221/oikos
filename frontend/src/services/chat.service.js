@@ -69,19 +69,10 @@ export const chatService = {
     }
   },
 
-  async getHistory() {
-    try {
-      const token = localStorage.getItem("token"); // Or however auth token is accessed, but typically services use current auth state or pass it in.
-      // Better to rely on axios interceptor if available, but here we used fetch for stream.
-      // Let's use the standard axios instance if possible, but for consistency with streamMessage let's use fetch or just import api from utils.
-      // Wait, auth.service.js uses `../utils/axios`. Let's use that for non-streaming calls.
-      const { default: api } = await import("../utils/axios");
-      const response = await api.get("/chat/history");
-      return response.data;
-    } catch (error) {
-      console.error("Failed to load history:", error);
-      throw error;
-    }
+  async getHistory(params = {}) {
+    const { default: api } = await import("../utils/axios");
+    // Ensure we pass page if standard pagination is used
+    return (await api.get("/chat/history", { params })).data;
   },
 
   async clearHistory() {

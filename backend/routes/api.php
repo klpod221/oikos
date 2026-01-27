@@ -92,6 +92,8 @@ Route::middleware(['auth:sanctum', 'user.active'])->group(function () {
     });
 });
 
+
+
 // Admin routes
 Route::middleware(['auth:sanctum', 'user.active', 'admin'])->prefix('admin')->group(function () {
     // User Management

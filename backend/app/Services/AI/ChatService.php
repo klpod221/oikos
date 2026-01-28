@@ -46,19 +46,15 @@ class ChatService
      */
     public function streamChat(int $userId, string $userMessage): Generator
     {
-        // 1. Save user message
         $this->saveMessage($userId, 'user', $userMessage);
 
-        // 2. Build messages array with memory
         $messages = $this->buildMessages($userId);
 
-        // 3. Get RAG context
         $ragContext = $this->getRAGContext($userMessage);
         if ($ragContext) {
             $messages = $this->injectRAGContext($messages, $ragContext);
         }
 
-        // 4. Stream completion with potential tool calls
         yield from $this->streamWithTools($userId, $messages);
     }
 

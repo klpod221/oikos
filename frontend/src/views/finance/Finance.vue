@@ -70,7 +70,7 @@ const debouncedFetch = debounce(() => {
 }, 500);
 
 watch([searchQuery, typeFilter, walletFilter, dateRange], () => {
-  // If only search changed, we rely on debounce logic implicitly if we wanted, 
+  // If only search changed, we rely on debounce logic implicitly if we wanted,
   // but here we debounce the fetch action itself to cover all filter changes mostly for search
   debouncedFetch();
 });
@@ -88,9 +88,12 @@ const fetchTransactions = (page = 1) => {
 
   // Only add sort if we have a valid field
   if (sortState.value.field && sortState.value.order) {
-    const sortField = sortState.value.field === 'date' ? 'transaction_date' : sortState.value.field;
+    const sortField =
+      sortState.value.field === "date"
+        ? "transaction_date"
+        : sortState.value.field;
     // Only send if it's a valid column
-    if (['transaction_date', 'amount', 'created_at'].includes(sortField)) {
+    if (["transaction_date", "amount", "created_at"].includes(sortField)) {
       params.sort_by = sortField;
       params.sort_order = sortState.value.order;
     }
@@ -112,10 +115,10 @@ const handleTableChange = (pagination, filters, sorter) => {
       order: sorter.order === "ascend" ? "asc" : "desc",
     };
   } else {
-      // No sort applied
-      sortState.value = { field: null, order: null };
+    // No sort applied
+    sortState.value = { field: null, order: null };
   }
-  
+
   // Handle Pagination (if page size changes, reset to page 1, else go to current)
   // But usually we just take pagination.current
   // If we are just changing page:
@@ -217,7 +220,7 @@ const openTransactionModal = (transaction = null) => {
         wallet_id: transaction.wallet?.id,
         category_id: transaction.category?.id,
         // Ensure date is formatted correctly for input type="date"
-        transaction_date: transaction.transaction_date, 
+        transaction_date: transaction.transaction_date,
       }
     : {
         wallet_id: finance.wallets[0]?.id || null,
@@ -299,7 +302,9 @@ const handleCategoryDelete = async (id) => {
     >
       <div>
         <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Tài chính</h1>
-        <p class="text-xs sm:text-sm text-slate-500">Quản lý ví và giao dịch của bạn</p>
+        <p class="text-xs sm:text-sm text-slate-500">
+          Quản lý ví và giao dịch của bạn
+        </p>
       </div>
       <div class="flex flex-wrap gap-2">
         <a-button @click="openTransactionModal()" size="middle">
@@ -312,12 +317,22 @@ const handleCategoryDelete = async (id) => {
           <span class="hidden! sm:inline!">Mục tiêu mới</span>
           <span class="ml-1 sm:hidden!">Mục tiêu</span>
         </a-button>
-        <a-button v-if="activeTab === 'wallets'" type="primary" @click="openWalletModal()" size="middle">
+        <a-button
+          v-if="activeTab === 'wallets'"
+          type="primary"
+          @click="openWalletModal()"
+          size="middle"
+        >
           <template #icon><PlusOutlined /></template>
           <span class="hidden! sm:inline!">Ví mới</span>
           <span class="ml-1 sm:hidden!">Ví</span>
         </a-button>
-        <a-button v-if="activeTab === 'categories'" type="primary" @click="showCategoryModal()" size="middle">
+        <a-button
+          v-if="activeTab === 'categories'"
+          type="primary"
+          @click="showCategoryModal()"
+          size="middle"
+        >
           <template #icon><PlusOutlined /></template>
           <span class="hidden! sm:inline!">Danh mục mới</span>
           <span class="ml-1 sm:hidden!">Danh mục</span>
@@ -332,9 +347,15 @@ const handleCategoryDelete = async (id) => {
       <div class="flex items-center justify-between">
         <div>
           <p class="text-blue-100 text-xs sm:text-sm">Tổng số dư</p>
-          <h2 class="text-2xl sm:text-3xl font-bold mt-1">
-            {{ formatCurrency(finance.totalBalance, "VND") }}
-          </h2>
+          <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mt-1">
+            <h2
+              v-for="(balance, currency) in finance.balancesByCurrency"
+              :key="currency"
+              class="text-xl sm:text-2xl font-bold"
+            >
+              {{ formatCurrency(balance, currency) }}
+            </h2>
+          </div>
         </div>
         <WalletOutlined class="text-3xl sm:text-4xl opacity-50" />
       </div>
@@ -344,7 +365,9 @@ const handleCategoryDelete = async (id) => {
     <a-tabs v-model:activeKey="activeTab">
       <!-- Wallets Tab -->
       <a-tab-pane key="wallets" tab="Ví của tôi">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3"
+        >
           <WalletCard
             v-for="wallet in finance.wallets"
             :key="wallet.id"
@@ -406,7 +429,7 @@ const handleCategoryDelete = async (id) => {
               </a-select>
             </a-col>
             <a-col :xs="24" :sm="12" :md="6">
-                <a-range-picker v-model:value="dateRange" class="w-full" />
+              <a-range-picker v-model:value="dateRange" class="w-full" />
             </a-col>
           </a-row>
         </div>
@@ -423,7 +446,9 @@ const handleCategoryDelete = async (id) => {
 
       <!-- Savings Goals Tab -->
       <a-tab-pane key="savings" tab="Mục tiêu tiết kiệm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3"
+        >
           <SavingsGoalCard
             v-for="goal in finance.savingsGoals"
             :key="goal.id"
@@ -445,8 +470,10 @@ const handleCategoryDelete = async (id) => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Income Categories -->
           <div>
-            <h3 class="text-lg font-semibold mb-4 text-green-600 flex items-center gap-2">
-               Thu nhập
+            <h3
+              class="text-lg font-semibold mb-4 text-green-600 flex items-center gap-2"
+            >
+              Thu nhập
             </h3>
             <div class="space-y-2">
               <div
@@ -457,22 +484,39 @@ const handleCategoryDelete = async (id) => {
                 :style="{ borderLeftColor: cat.color }"
               >
                 <div class="flex items-center gap-3">
-                   <div
+                  <div
                     class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-slate-50"
                   >
                     {{ cat.icon || "🏷️" }}
                   </div>
                   <div>
-                     <p class="font-medium text-slate-800">{{ cat.name }}</p>
-                    <a-tag v-if="!cat.scope || cat.scope === 'system'" color="blue" class="text-xs">Hệ thống</a-tag>
+                    <p class="font-medium text-slate-800">{{ cat.name }}</p>
+                    <a-tag
+                      v-if="!cat.scope || cat.scope === 'system'"
+                      color="blue"
+                      class="text-xs"
+                      >Hệ thống</a-tag
+                    >
                   </div>
                 </div>
-                 <div v-if="cat.scope === 'custom'" class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <a-button type="text" size="small" @click="showCategoryModal(cat)">
+                <div
+                  v-if="cat.scope === 'custom'"
+                  class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <a-button
+                    type="text"
+                    size="small"
+                    @click="showCategoryModal(cat)"
+                  >
                     <template #icon><EditOutlined /></template>
                   </a-button>
-                  <a-button type="text" danger size="small" @click="handleCategoryDelete(cat.id)">
-                     <template #icon><DeleteOutlined /></template>
+                  <a-button
+                    type="text"
+                    danger
+                    size="small"
+                    @click="handleCategoryDelete(cat.id)"
+                  >
+                    <template #icon><DeleteOutlined /></template>
                   </a-button>
                 </div>
               </div>
@@ -481,33 +525,52 @@ const handleCategoryDelete = async (id) => {
 
           <!-- Expense Categories -->
           <div>
-            <h3 class="text-lg font-semibold mb-4 text-red-600 flex items-center gap-2">
-               Chi tiêu
+            <h3
+              class="text-lg font-semibold mb-4 text-red-600 flex items-center gap-2"
+            >
+              Chi tiêu
             </h3>
             <div class="space-y-2">
               <div
                 v-for="cat in finance.expenseCategories"
                 :key="cat.id"
-                 class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between group hover:border-blue-400 transition-colors"
+                class="bg-white border border-slate-200 rounded-lg p-3 flex items-center justify-between group hover:border-blue-400 transition-colors"
                 :class="{ 'border-l-4': true }"
                 :style="{ borderLeftColor: cat.color }"
               >
                 <div class="flex items-center gap-3">
-                   <div
+                  <div
                     class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-slate-50"
                   >
                     {{ cat.icon || "🏷️" }}
                   </div>
-                   <div>
-                     <p class="font-medium text-slate-800">{{ cat.name }}</p>
-                    <a-tag v-if="!cat.scope || cat.scope === 'system'" color="blue" class="text-xs">Hệ thống</a-tag>
+                  <div>
+                    <p class="font-medium text-slate-800">{{ cat.name }}</p>
+                    <a-tag
+                      v-if="!cat.scope || cat.scope === 'system'"
+                      color="blue"
+                      class="text-xs"
+                      >Hệ thống</a-tag
+                    >
                   </div>
                 </div>
-                <div v-if="cat.scope === 'custom'" class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <a-button type="text" size="small" @click="showCategoryModal(cat)">
-                     <template #icon><EditOutlined /></template>
+                <div
+                  v-if="cat.scope === 'custom'"
+                  class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <a-button
+                    type="text"
+                    size="small"
+                    @click="showCategoryModal(cat)"
+                  >
+                    <template #icon><EditOutlined /></template>
                   </a-button>
-                  <a-button type="text" danger size="small" @click="handleCategoryDelete(cat.id)">
+                  <a-button
+                    type="text"
+                    danger
+                    size="small"
+                    @click="handleCategoryDelete(cat.id)"
+                  >
                     <template #icon><DeleteOutlined /></template>
                   </a-button>
                 </div>

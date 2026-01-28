@@ -77,6 +77,6 @@ export const chatService = {
 
   async clearHistory() {
     const { default: api } = await import("../utils/axios");
-    await api.post("/chat/clear");
+    await api.delete("/chat/clear");
   },
 };

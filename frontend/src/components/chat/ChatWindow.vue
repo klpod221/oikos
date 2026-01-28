@@ -183,6 +183,73 @@ const handleSend = async (content) => {
       </div>
 
       <div class="max-w-3xl mx-auto space-y-6">
+        <!-- Welcome Message when no history -->
+        <div
+          v-if="store.messages.length === 0 && !store.isLoading"
+          class="flex flex-col items-center justify-center py-12 text-center"
+        >
+          <div
+            class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-8 h-8 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">Xin chào! 👋</h2>
+          <p class="text-gray-500 mb-6 max-w-md">
+            Tôi là OikOS Assistant, trợ lý AI giúp bạn quản lý cuộc sống hàng
+            ngày.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left max-w-lg">
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="font-medium text-gray-700 text-sm mb-1">
+                💰 Tài chính
+              </div>
+              <p class="text-xs text-gray-500">
+                Ghi chép thu chi, theo dõi số dư, báo cáo tài chính
+              </p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="font-medium text-gray-700 text-sm mb-1">
+                🥗 Dinh dưỡng
+              </div>
+              <p class="text-xs text-gray-500">
+                Tra cứu nguyên liệu, lên kế hoạch bữa ăn
+              </p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="font-medium text-gray-700 text-sm mb-1">
+                🏋️ Thể dục
+              </div>
+              <p class="text-xs text-gray-500">
+                Tìm bài tập, xem lịch tập luyện
+              </p>
+            </div>
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="font-medium text-gray-700 text-sm mb-1">
+                📊 Thống kê
+              </div>
+              <p class="text-xs text-gray-500">
+                Báo cáo tuần, mục tiêu sức khỏe
+              </p>
+            </div>
+          </div>
+          <p class="text-gray-400 text-sm mt-6">
+            Hãy nhắn tin để bắt đầu cuộc trò chuyện!
+          </p>
+        </div>
+
         <MessageItem
           v-for="(msg, index) in store.messages"
           :key="msg.id || index"

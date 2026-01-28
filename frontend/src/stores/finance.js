@@ -25,10 +25,18 @@ export const useFinanceStore = defineStore("finance", () => {
   const savingsGoals = ref([]);
   const loading = ref(false);
 
-  // Computed
-  const totalBalance = computed(() =>
-    wallets.value.reduce((sum, w) => sum + Number(w.balance || 0), 0),
-  );
+  // Computed - Group balances by currency
+  const balancesByCurrency = computed(() => {
+    const grouped = {};
+    wallets.value.forEach((w) => {
+      const currency = w.currency || "VND";
+      grouped[currency] = (grouped[currency] || 0) + Number(w.balance || 0);
+    });
+    return grouped;
+  });
+
+  // Backward compatible - VND total only
+  const totalBalance = computed(() => balancesByCurrency.value.VND || 0);
 
   const incomeCategories = computed(() =>
     categories.value.filter((c) => c.type === "income"),
@@ -261,6 +269,7 @@ export const useFinanceStore = defineStore("finance", () => {
     loading,
     // Computed
     totalBalance,
+    balancesByCurrency,
     incomeCategories,
     expenseCategories,
     // Actions

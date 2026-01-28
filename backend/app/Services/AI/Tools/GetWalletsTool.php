@@ -41,16 +41,23 @@ class GetWalletsTool extends AITool
         }
 
         $list = "Wallets:\n";
-        $totalBalance = 0;
+        $balancesByCurrency = [];
 
         foreach ($wallets as $wallet) {
             $balance = number_format($wallet->balance, 0, ',', '.');
             $default = $wallet->is_default ? ' ⭐' : '';
             $list .= "- {$wallet->name}: {$balance} {$wallet->currency}{$default}\n";
-            $totalBalance += $wallet->balance;
+
+            $currency = $wallet->currency ?? 'VND';
+            $balancesByCurrency[$currency] = ($balancesByCurrency[$currency] ?? 0) + $wallet->balance;
         }
 
-        $list .= "\nTotal: " . number_format($totalBalance, 0, ',', '.') . " VND";
+        // Format totals by currency
+        $totals = [];
+        foreach ($balancesByCurrency as $currency => $total) {
+            $totals[] = number_format($total, 0, ',', '.') . " {$currency}";
+        }
+        $list .= "\nTotal: " . implode(' | ', $totals);
 
         return [
             'success' => true,

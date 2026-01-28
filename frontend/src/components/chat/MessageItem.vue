@@ -91,7 +91,7 @@ const formatTime = (isoString) => {
         <!-- Assistant Message (Markdown) -->
         <div
           v-if="msg.role === 'assistant'"
-          class="prose prose-sm max-w-none wrap-break-word dark:prose-invert"
+          class="prose prose-sm prose-gray max-w-none wrap-break-word [&_*]:!text-inherit"
           v-html="md.render(msg.content)"
         ></div>
 

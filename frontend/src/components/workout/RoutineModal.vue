@@ -89,7 +89,18 @@ const removeExercise = (index) => {
 };
 
 const handleOk = () => {
-  emit("submit", form.value);
+  // Transform exercises to match backend expected format
+  const payload = {
+    ...form.value,
+    exercises: form.value.exercises.map((item) => ({
+      exercise_id: item.exercise_id,
+      order: item.order,
+      // Backend expects target_value (reps or duration in seconds)
+      target_value: item.duration_seconds || item.reps || 10,
+      rest_time: item.rest_seconds ?? 30,
+    })),
+  };
+  emit("submit", payload);
 };
 </script>
 

@@ -4,9 +4,8 @@
 .DS_Store
 
 # Data directories
-qdrant_data/
-tei_data/
 postgres_data/
+
 
 # Logs
 *.log

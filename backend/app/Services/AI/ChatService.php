@@ -9,12 +9,10 @@ use Illuminate\Support\Facades\Log;
 use Generator;
 
 /**
- * Main chat orchestrator with RAG, function calling, and streaming.
+ * Main chat orchestrator with function calling and streaming.
  */
 class ChatService
 {
-    private EmbeddingService $embeddingService;
-    private VectorSearchService $vectorSearchService;
     private ToolExecutor $toolExecutor;
 
     private string $apiUrl;
@@ -23,12 +21,8 @@ class ChatService
     private int $memoryLimit;
 
     public function __construct(
-        EmbeddingService $embeddingService,
-        VectorSearchService $vectorSearchService,
         ToolExecutor $toolExecutor
     ) {
-        $this->embeddingService = $embeddingService;
-        $this->vectorSearchService = $vectorSearchService;
         $this->toolExecutor = $toolExecutor;
 
         $this->apiUrl = config('services.openai.url', 'http://localhost:8045/v1');
@@ -38,7 +32,7 @@ class ChatService
     }
 
     /**
-     * Process a chat message with RAG and streaming response.
+     * Process a chat message with streaming response.
      *
      * @param int $userId
      * @param string $userMessage
@@ -49,11 +43,6 @@ class ChatService
         $this->saveMessage($userId, 'user', $userMessage);
 
         $messages = $this->buildMessages($userId);
-
-        $ragContext = $this->getRAGContext($userMessage);
-        if ($ragContext) {
-            $messages = $this->injectRAGContext($messages, $ragContext);
-        }
 
         yield from $this->streamWithTools($userId, $messages);
     }
@@ -130,68 +119,6 @@ You are OikOS Assistant, an intelligent AI assistant helping users manage person
 5. Keep responses concise, friendly, and actionable.
 6. For financial amounts, use VND format with thousand separators.
 PROMPT;
-    }
-
-    /**
-     * Get RAG context for the query.
-     *
-     * @param string $query
-     * @return string|null
-     */
-    private function getRAGContext(string $query): ?string
-    {
-        try {
-            if ($this->isSimpleGreeting($query)) {
-                return null;
-            }
-
-            $vector = $this->embeddingService->embed($query);
-            $results = $this->vectorSearchService->search($vector);
-
-            return empty($results) ? null : $this->vectorSearchService->formatAsContext($results);
-        } catch (\Exception $e) {
-            Log::warning('RAG context retrieval failed', ['error' => $e->getMessage()]);
-            return null;
-        }
-    }
-
-    /**
-     * Check if message is a simple greeting.
-     *
-     * @param string $message
-     * @return bool
-     */
-    private function isSimpleGreeting(string $message): bool
-    {
-        $greetings = ['hi', 'hello', 'xin chào', 'chào', 'hey', 'alo'];
-        $normalized = mb_strtolower(trim($message));
-
-        foreach ($greetings as $greeting) {
-            if ($normalized === $greeting || str_starts_with($normalized, $greeting . ' ')) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Inject RAG context into messages.
-     *
-     * @param array $messages
-     * @param string $context
-     * @return array
-     */
-    private function injectRAGContext(array $messages, string $context): array
-    {
-        foreach ($messages as &$message) {
-            if ($message['role'] === 'system') {
-                $message['content'] .= "\n\n" . $context;
-                break;
-            }
-        }
-
-        return $messages;
     }
 
     /**

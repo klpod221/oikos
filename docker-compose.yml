@@ -33,7 +33,7 @@ services:
     image: eceasy/cli-proxy-api:latest
     container_name: oikos_cli_proxy
     ports:
-      - "8317:8317"
+      - "8321:8317"
     volumes:
       - ./cli-proxy-config.yaml:/CLIProxyAPI/config.yaml
       - ./cli-proxy-auth:/root/.cli-proxy-api
@@ -47,8 +47,9 @@ services:
     container_name: oikos_backend
     volumes:
       - ./backend:/var/www/html
+      - /var/www/html/vendor
     ports:
-      - "8000:8000"
+      - "8080:8000"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -78,53 +79,10 @@ services:
     environment:
       VITE_PROXY_TARGET: http://backend:8000
     ports:
-      - "5173:5173"
+      - "3000:5173"
 
   # === RAG SERVICES ===
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: oikos_qdrant
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - ./qdrant_data:/qdrant/storage
-    environment:
-      QDRANT__LOG_LEVEL: INFO
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  tei:
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.5
-    container_name: oikos_tei
-    ports:
-      - "8080:80"
-    volumes:
-      - ./tei_data:/data
-    entrypoint:
-      - text-embeddings-router
-      - --model-id
-      - /data/models/bge-m3
-      - --dtype
-      - float32
-      - --max-client-batch-size
-      - "8"
-      - --max-batch-tokens
-      - "4096"
-    deploy:
-      resources:
-        limits:
-          memory: 4g
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+  # Removed per user request
 
 volumes:
   postgres_data:

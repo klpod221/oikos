@@ -13,16 +13,16 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
-            UserStatsSeeder::class, // Stats for admin
             SystemCategorySeeder::class,
-            WalletSeeder::class,
-            TransactionSeeder::class,
-            SavingsGoalSeeder::class,
-            IngredientSeeder::class,
-            RecipeSeeder::class,
-            MealPlanSeeder::class,
-            ExerciseSeeder::class,
-            RoutineSeeder::class,
+            // IngredientSeeder::class,
+            // UserStatsSeeder::class,
+            // WalletSeeder::class,
+            // TransactionSeeder::class,
+            // SavingsGoalSeeder::class,
+            // RecipeSeeder::class,
+            // MealPlanSeeder::class,
+            // ExerciseSeeder::class,
+            // RoutineSeeder::class,
         ]);
     }
 }

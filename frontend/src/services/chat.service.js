@@ -3,7 +3,7 @@
  * Handles SSE streaming manually to support Bearer token authentication.
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 export const chatService = {
   /**

@@ -48,17 +48,5 @@ return [
         'memory_limit' => env('OPENAI_MEMORY_LIMIT', 10),
     ],
 
-    'qdrant' => [
-        'url' => env('QDRANT_URL', 'http://localhost:6333'),
-        'collection' => env('QDRANT_COLLECTION', 'oikos_knowledge'),
-        'timeout' => env('QDRANT_TIMEOUT', 10),
-        'score_threshold' => env('QDRANT_SCORE_THRESHOLD', 0.7),
-        'limit' => env('QDRANT_LIMIT', 5),
-    ],
-
-    'tei' => [
-        'url' => env('TEI_URL', 'http://localhost:8080'),
-        'timeout' => env('TEI_TIMEOUT', 30),
-    ],
 
 ];

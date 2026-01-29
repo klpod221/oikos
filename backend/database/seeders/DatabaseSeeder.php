@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             SystemCategorySeeder::class,
+            SystemSettingSeeder::class,
             // IngredientSeeder::class,
             // UserStatsSeeder::class,
             // WalletSeeder::class,

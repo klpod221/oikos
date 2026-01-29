@@ -81,6 +81,13 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const setAuthData = (data) => {
+    token.value = data.token;
+    user.value = data.user;
+    localStorage.setItem("token", token.value);
+    api.defaults.headers.common.Authorization = `Bearer ${token.value}`;
+  };
+
   return {
     user,
     token,
@@ -92,5 +99,6 @@ export const useAuthStore = defineStore("auth", () => {
     register,
     logout,
     fetchUser,
+    setAuthData,
   };
 });

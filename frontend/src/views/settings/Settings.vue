@@ -16,6 +16,7 @@ import {
   SafetyOutlined,
   BarChartOutlined,
   HeartOutlined,
+  ApiOutlined,
 } from "@ant-design/icons-vue";
 
 // Form Components
@@ -24,6 +25,7 @@ import PreferencesForm from "../../components/settings/PreferencesForm.vue";
 import PasswordForm from "../../components/settings/PasswordForm.vue";
 import UserStatsForm from "../../components/settings/UserStatsForm.vue";
 import UserGoalsForm from "../../components/settings/UserGoalsForm.vue";
+import IntegrationSettings from "../../components/settings/IntegrationSettings.vue";
 
 const activeKey = ref("profile");
 </script>
@@ -142,6 +144,21 @@ const activeKey = ref("profile");
             Đổi mật khẩu
           </h2>
           <PasswordForm />
+        </div>
+      </a-tab-pane>
+      <!-- Integration Tab -->
+      <a-tab-pane key="integration">
+        <template #tab>
+          <span class="flex items-center gap-2">
+            <ApiOutlined />
+            <span class="hidden sm:inline">Kết nối</span>
+          </span>
+        </template>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+          <h2 class="text-lg font-semibold text-slate-800 mb-4">
+            Kết nối tài khoản
+          </h2>
+          <IntegrationSettings />
         </div>
       </a-tab-pane>
     </a-tabs>

@@ -15,6 +15,12 @@ const routes = [
     meta: { guest: true },
   },
   {
+    path: "/auth/google/callback",
+    name: "GoogleCallback",
+    component: () => import("../views/auth/GoogleCallback.vue"),
+    meta: { guest: true },
+  },
+  {
     path: "/maintenance",
     name: "Maintenance",
     component: () => import("../views/Maintenance.vue"),

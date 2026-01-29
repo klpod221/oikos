@@ -18,9 +18,10 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'avatar' => $this->avatar ? \Illuminate\Support\Facades\Storage::url($this->avatar) : null,
+            'avatar' => $this->avatar && !str_starts_with($this->avatar, 'http') ? 'storage/' . $this->avatar : $this->avatar,
             'role' => $this->role,
             'status' => $this->status,
+            'google_id' => $this->google_id, // Expose Google ID
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

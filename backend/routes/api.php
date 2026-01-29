@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::get('/auth/google/url', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'getAuthUrl']);
+Route::post('/auth/google/callback', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'callback']);
 Route::get('/settings/public', [\App\Http\Controllers\Api\Admin\SystemSettingController::class, 'publicSettings']);
 
 // Protected routes

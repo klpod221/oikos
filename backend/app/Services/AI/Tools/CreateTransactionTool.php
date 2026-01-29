@@ -26,7 +26,7 @@ class CreateTransactionTool extends AITool
 
     public function dependsOn(): array
     {
-        return ['get_categories'];
+        return ['get_categories', 'get_wallets'];
     }
 
     public function parameters(): array
@@ -49,18 +49,18 @@ class CreateTransactionTool extends AITool
                 ],
                 'category' => [
                     'type' => 'string',
-                    'description' => 'Category name (e.g., Food, Travel). Optional if not explicitly mentioned.',
+                    'description' => 'Category name. IMPORTANT: You MUST use get_categories first to find a valid category name.',
                 ],
                 'wallet' => [
                     'type' => 'string',
-                    'description' => 'Wallet name to use (optional, uses default if not specified)',
+                    'description' => 'Wallet name. IMPORTANT: You MUST use get_wallets first to find a valid wallet name.',
                 ],
                 'date' => [
                     'type' => 'string',
-                    'description' => 'Transaction date in YYYY-MM-DD format (optional, uses today if not specified)',
+                    'description' => 'Transaction date in YYYY-MM-DD format.',
                 ],
             ],
-            'required' => ['amount', 'type'],
+            'required' => ['amount', 'type', 'category', 'wallet'],
         ];
     }
 
@@ -180,7 +180,16 @@ class CreateTransactionTool extends AITool
         }
 
         // Fall back to default wallet or first wallet
-        return $query->where('is_default', true)->first()
-            ?? $query->first();
+        $default = (clone $query)->where('is_default', true)->first();
+        if ($default) {
+            return $default;
+        }
+
+        $first = $query->first();
+        if ($first) {
+            return $first;
+        }
+
+        return null;
     }
 }

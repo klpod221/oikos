@@ -15,6 +15,7 @@ import {
   LockOutlined,
   MailOutlined,
 } from "@ant-design/icons-vue";
+import GoogleLoginButton from "../../components/Auth/GoogleLoginButton.vue";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -41,7 +42,7 @@ onMounted(async () => {
       registrationAllowed.value = allowed;
     }
   } catch (e) {
-    // Fallback to true or handle error
+    console.warn("Could not fetch registration settings:", e);
   } finally {
     loadingSettings.value = false;
   }
@@ -168,6 +169,11 @@ const onSubmit = async () => {
     <div class="text-center text-slate-500 mt-6">
       Đã có tài khoản?
       <router-link to="/login" class="text-blue-500">Đăng nhập</router-link>
+    </div>
+
+    <div class="mt-6 border-t pt-6 text-center">
+      <p class="text-slate-400 text-sm mb-4">Hoặc đăng ký với</p>
+      <GoogleLoginButton />
     </div>
   </div>
 </template>

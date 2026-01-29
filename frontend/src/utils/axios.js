@@ -7,9 +7,10 @@
  * - Response Interceptor: Handles 401 Unauthorized (redirects to login)
  */
 import axios from "axios";
+import config from "../config/app";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: config.api.baseUrl,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

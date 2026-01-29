@@ -49,6 +49,12 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'description' => 'Ngôn ngữ mặc định của hệ thống.',
             ],
+            [
+                'key' => 'gmail_search_query',
+                'value' => 'subject:(biến động số dư) OR subject:(giao dịch) OR subject:(transaction) OR subject:(biên lai) OR subject:(transfer) OR subject:(receipt) -category:promotions -category:social',
+                'type' => 'string',
+                'description' => 'Truy vấn tìm kiếm email ngân hàng (Gmail).',
+            ],
         ];
 
         foreach ($settings as $setting) {

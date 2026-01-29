@@ -245,6 +245,97 @@ PROMPT;
     }
 
     /**
+     * Run chat in background with tools (Non-streaming).
+     * Used for background jobs like Gmail Sync.
+     *
+     * @param int $userId
+     * @param string $systemPrompt
+     * @param string $userMessage
+     * @return string
+     */
+    public function runWithTools(int $userId, string $systemPrompt, string $userMessage): string
+    {
+        // 1. Prepare Messages
+        $messages = [
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userMessage],
+        ];
+
+        // 2. Loop for Tool Execution (Max 5 turns)
+        $maxIterations = 5;
+        $iteration = 0;
+
+        while ($iteration < $maxIterations) {
+            $iteration++;
+
+            // Call API
+            $payload = [
+                'model' => $this->model,
+                'messages' => $messages,
+                'tools' => $this->toolExecutor->getToolsDefinition(),
+                'tool_choice' => 'auto',
+                'stream' => false,
+            ];
+
+            $response = $this->fetchCompletion($payload);
+            $content = $response['content'];
+            $toolCalls = $response['tool_calls'];
+
+            // If no tool calls, we are done.
+            if (empty($toolCalls)) {
+                return $content;
+            }
+
+            // Append Assistant Response to history for next turn
+            $messages[] = [
+                'role' => 'assistant',
+                'content' => $content,
+                'tool_calls' => $toolCalls,
+            ];
+
+            // Execute Tools
+            $toolResults = $this->executeToolCalls($toolCalls, $userId);
+
+            // Append Tool Results
+            foreach ($toolResults as $result) {
+                $messages[] = [
+                    'role' => 'tool',
+                    'tool_call_id' => $result['id'],
+                    'content' => $result['result'],
+                ];
+            }
+
+            // Loop back to give AI a chance to summarize or do more actions
+        }
+
+        return "Max iterations reached.";
+    }
+
+    /**
+     * Generate a completion (public wrapper for AI services).
+     *
+     * @param string $systemPrompt
+     * @param string $userMessage
+     * @return string|null
+     */
+    public function generateCompletion(string $systemPrompt, string $userMessage): ?string
+    {
+        $messages = [
+            ['role' => 'system', 'content' => $systemPrompt],
+            ['role' => 'user', 'content' => $userMessage],
+        ];
+
+        $payload = [
+            'model' => $this->model,
+            'messages' => $messages,
+            'stream' => false,
+        ];
+
+        $result = $this->fetchCompletion($payload);
+        return $result['content'] ?? null;
+    }
+
+    /**
      * Fetch completion from API (non-streaming).
      *
      * @param array $payload
@@ -266,8 +357,14 @@ PROMPT;
                     'status' => $response->status(),
                     'body' => $response->body(),
                 ]);
-                return ['content' => 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.'];
+                return [
+                    'content' => 'Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại.',
+                    'tool_calls' => [],
+                ];
             }
+
+            // Log Response for debugging
+            // Log::info('AI Response', $response->json());
 
             /** @var array $data */
             $data = $response->json();
@@ -279,7 +376,10 @@ PROMPT;
             ];
         } catch (\Exception $e) {
             Log::error('Completion API error', ['error' => $e->getMessage()]);
-            return ['content' => 'Xin lỗi, không thể kết nối đến AI. Vui lòng thử lại.'];
+            return [
+                'content' => 'Xin lỗi, không thể kết nối đến AI. Vui lòng thử lại.',
+                'tool_calls' => [],
+            ];
         }
     }
 
@@ -439,15 +539,40 @@ PROMPT;
      * @param int $userId
      * @return array
      */
+    /**
+     * Execute tool calls.
+     * Handles both raw OpenAI format and parsed internal format.
+     *
+     * @param array $toolCalls
+     * @param int $userId
+     * @return array
+     */
     private function executeToolCalls(array $toolCalls, int $userId): array
     {
         $results = [];
-        $parsed = $this->toolExecutor->parseToolCalls($toolCalls);
+        $parsed = [];
+
+        // Determine if we need to parse
+        // Check first item
+        $first = reset($toolCalls);
+        if ($first && isset($first['function'])) {
+            // It's Raw OpenAI format
+            $parsed = $this->toolExecutor->parseToolCalls($toolCalls);
+        } else {
+            // It's already parsed or some other format
+            $parsed = $toolCalls;
+        }
 
         foreach ($parsed as $call) {
+            if (!isset($call['name']) || !isset($call['arguments'])) {
+                Log::warning("Skipping invalid tool call structure", ['call' => $call]);
+                continue;
+            }
+
             $result = $this->toolExecutor->execute($call['name'], $call['arguments'], $userId);
+
             $results[] = [
-                'id' => $call['id'],
+                'id' => $call['id'] ?? uniqid('tool_exec_'),
                 'result' => $result['result'],
             ];
         }

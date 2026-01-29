@@ -10,6 +10,7 @@ import { ref } from "vue";
 import { settingsService } from "../services/settings.service";
 import { message } from "ant-design-vue";
 import { useAuthStore } from "./auth";
+import config from "../config/app";
 
 export const useSettingsStore = defineStore("settings", () => {
   const settings = ref(null);
@@ -49,7 +50,9 @@ export const useSettingsStore = defineStore("settings", () => {
       const res = await settingsService.updateAvatar(formData);
       // Update local user state with new avatar URL
       if (auth.user) {
-        auth.user.avatar = res.data.data.avatar_url;
+        // Backend returns path like 'storage/avatars/filename.jpg'
+        // Use config.api.rootUrl which already removes /api suffix
+        auth.user.avatar = `${config.api.rootUrl}/${res.data.data.avatar}`;
       }
       message.success("Cập nhật ảnh đại diện thành công");
       return true;

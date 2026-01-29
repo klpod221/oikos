@@ -161,5 +161,28 @@ onMounted(() => {
         </a-form>
       </a-card>
     </div>
+
+    <!-- Gmail Integration -->
+    <a-card
+      title="📧 Cấu hình Gmail Auto-Sync"
+      class="shadow-sm rounded-xl mt-6"
+    >
+      <a-form layout="vertical">
+        <a-form-item
+          label="Truy vấn tìm kiếm (Query)"
+          help="Query chuẩn của Gmail API. Hỗ trợ: subject:(...), from:(...), -category:..."
+        >
+          <a-textarea
+            v-model:value="formState['gmail_search_query']"
+            :rows="3"
+            placeholder="subject:(transaction) ..."
+          />
+        </a-form-item>
+        <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-700">
+          <strong>Lưu ý:</strong> Thay đổi query sẽ ảnh hưởng đến lần quét tiếp
+          theo (mỗi 5 phút).
+        </div>
+      </a-form>
+    </a-card>
   </div>
 </template>

@@ -11,6 +11,7 @@ import { useAuthStore } from "../../stores/auth";
 import { authService } from "../../services/auth.service";
 import { message } from "ant-design-vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
+import GoogleLoginButton from "../../components/Auth/GoogleLoginButton.vue";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -27,7 +28,7 @@ onMounted(async () => {
       registrationAllowed.value = allowed;
     }
   } catch (e) {
-    /* ignore */
+    console.warn("Could not fetch registration settings:", e);
   }
 });
 
@@ -95,6 +96,11 @@ const onSubmit = async () => {
     <div v-if="registrationAllowed" class="text-center text-slate-500">
       Chưa có tài khoản?
       <router-link to="/register" class="text-blue-500">Đăng ký</router-link>
+    </div>
+
+    <div class="mt-6 border-t pt-6 text-center">
+      <p class="text-slate-400 text-sm mb-4">Hoặc tiếp tục với</p>
+      <GoogleLoginButton />
     </div>
   </div>
 </template>

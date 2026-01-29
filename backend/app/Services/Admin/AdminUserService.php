@@ -55,4 +55,39 @@ class AdminUserService
 
         return $user;
     }
+    /**
+     * Create a new user
+     *
+     * @param array $data
+     * @return User
+     */
+    public function createUser(array $data): User
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']),
+            'role' => $data['role'] ?? 'user',
+            'status' => User::STATUS_ACTIVE,
+        ]);
+    }
+
+    /**
+     * Reset user password
+     *
+     * @param User $user
+     * @param string $newPassword
+     * @return User
+     */
+    public function resetPassword(User $user, string $newPassword): User
+    {
+        $user->update([
+            'password' => bcrypt($newPassword),
+        ]);
+
+        // Revoke all tokens to force re-login
+        $user->tokens()->delete();
+
+        return $user;
+    }
 }

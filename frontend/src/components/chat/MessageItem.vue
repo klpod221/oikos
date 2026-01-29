@@ -57,12 +57,16 @@ const formatTime = (isoString) => {
       >
         <RobotOutlined />
       </div>
-      <div
+      <a-avatar
         v-else
-        class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white shadow-sm"
+        :size="32"
+        :src="authStore.user?.avatar"
+        class="bg-gray-600 flex items-center justify-center text-white shadow-sm"
       >
-        <UserOutlined />
-      </div>
+        <template #icon v-if="!authStore.user?.avatar"
+          ><UserOutlined
+        /></template>
+      </a-avatar>
     </div>
 
     <!-- Content Bubble -->

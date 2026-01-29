@@ -5,14 +5,31 @@
   Handles user authentication via email/password.
 -->
 <script setup>
-import { reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+import { authService } from "../../services/auth.service";
 import { message } from "ant-design-vue";
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
 
 const router = useRouter();
 const auth = useAuthStore();
+const registrationAllowed = ref(true);
+
+onMounted(async () => {
+  try {
+    const response = await authService.getPublicSettings();
+    let allowed = response.data.allow_registration;
+    if (allowed === "true") allowed = true;
+    if (allowed === "false") allowed = false;
+
+    if (allowed !== undefined) {
+      registrationAllowed.value = allowed;
+    }
+  } catch (e) {
+    /* ignore */
+  }
+});
 
 const form = reactive({ email: "", password: "" });
 
@@ -75,7 +92,7 @@ const onSubmit = async () => {
       </a-form-item>
     </a-form>
 
-    <div class="text-center text-slate-500">
+    <div v-if="registrationAllowed" class="text-center text-slate-500">
       Chưa có tài khoản?
       <router-link to="/register" class="text-blue-500">Đăng ký</router-link>
     </div>

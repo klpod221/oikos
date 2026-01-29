@@ -44,10 +44,29 @@ class UserSettingsService
             Storage::disk('public')->delete($user->avatar);
         }
 
-        $path = $file->store('avatars', 'public');
-        $user->update(['avatar' => $path]);
+        // Create image manager instance with desired driver
+        $manager = new \Intervention\Image\ImageManager(
+            new \Intervention\Image\Drivers\Gd\Driver()
+        );
 
-        return $path;
+        // Read image from file input
+        $image = $manager->read($file);
+
+        // Resize image to max 500x500
+        $image->scale(height: 500);
+
+        // Encode image
+        $encoded = $image->toJpeg(quality: 80);
+
+        // Generate filename
+        $filename = 'avatars/' . uniqid() . '.jpg';
+
+        // Store optimized image
+        Storage::disk('public')->put($filename, (string) $encoded);
+
+        $user->update(['avatar' => $filename]);
+
+        return $filename;
     }
 
     /**

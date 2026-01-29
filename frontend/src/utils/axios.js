@@ -33,6 +33,14 @@ api.interceptors.response.use(
         globalThis.location.href = "/login";
       }
     }
+
+    // Handle Maintenance Mode
+    if (error.response?.status === 503 && error.response.data?.maintenance) {
+      if (globalThis.location.pathname !== "/maintenance") {
+        globalThis.location.href = "/maintenance";
+      }
+    }
+
     return Promise.reject(error);
   },
 );

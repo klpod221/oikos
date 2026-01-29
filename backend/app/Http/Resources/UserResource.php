@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'avatar' => $this->avatar ? \Illuminate\Support\Facades\Storage::url($this->avatar) : null,
             'role' => $this->role,
             'status' => $this->status,
             'created_at' => $this->created_at->toIso8601String(),

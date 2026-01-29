@@ -22,8 +22,7 @@ class AuthController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     /**
      * Login
@@ -58,6 +57,10 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
+        if (\App\Models\SystemSetting::getValue('allow_registration') === false) {
+            return response()->json(['message' => 'Đăng ký tài khoản đang tạm khóa.'], 403);
+        }
+
         $result = $this->authService->register(
             $request->validated(),
             $request->device_name

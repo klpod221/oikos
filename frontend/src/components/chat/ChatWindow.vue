@@ -13,8 +13,11 @@ import MessageItem from "./MessageItem.vue";
 import ChatInput from "./ChatInput.vue";
 import SearchMessageModal from "./SearchMessageModal.vue";
 
+import { authService } from "../../services/auth.service";
+
 const store = useChatStore();
 const showSearchModal = ref(false);
+const chatEnabled = ref(true); // Default true
 const messagesContainer = ref(null);
 const topSentinel = ref(null);
 const userScrolledUp = ref(false);
@@ -107,6 +110,16 @@ watch(
 );
 
 onMounted(async () => {
+  try {
+    const response = await authService.getPublicSettings();
+    let enabled = response.data.enable_ai_chat;
+    if (enabled === "true") enabled = true;
+    if (enabled === "false") enabled = false;
+    if (enabled !== undefined) chatEnabled.value = enabled;
+  } catch (e) {
+    console.error(e);
+  }
+
   await store.loadHistory();
   // Ensure we are scrolled to bottom BEFORE observing
   await scrollToBottom(true, "auto");
@@ -283,7 +296,18 @@ const handleSend = async (content) => {
     </button>
 
     <!-- Input Area -->
-    <ChatInput :loading="store.isStreaming" @send="handleSend" />
+    <ChatInput
+      :loading="store.isStreaming"
+      @send="handleSend"
+      v-if="chatEnabled"
+    />
+
+    <div
+      v-else
+      class="p-4 border-t border-gray-100 bg-gray-50 text-center text-gray-500"
+    >
+      <p>Tính năng AI Chat đã bị tạm khóa bởi quản trị viên.</p>
+    </div>
   </div>
 </template>
 

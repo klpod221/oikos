@@ -19,8 +19,7 @@ class UserController extends Controller
 {
     public function __construct(
         protected UserSettingsService $userSettingsService
-    ) {
-    }
+    ) {}
 
     /**
      * Get user profile and settings
@@ -95,6 +94,8 @@ class UserController extends Controller
             'silver_unit' => 'nullable|string|in:oz,lượng,chỉ',
             'language' => 'nullable|string|in:vi,en',
             'theme' => 'nullable|string|in:light,dark,system',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $user = $request->user();

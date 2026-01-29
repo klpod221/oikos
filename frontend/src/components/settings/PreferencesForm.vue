@@ -8,6 +8,9 @@
 import { ref, onMounted } from "vue";
 import { useSettingsStore } from "../../stores/settings";
 
+import { EnvironmentOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
+
 const settingsStore = useSettingsStore();
 const loading = ref(false);
 
@@ -17,6 +20,8 @@ const formState = ref({
   silver_unit: "lượng",
   language: "vi",
   theme: "system",
+  latitude: null,
+  longitude: null,
 });
 
 onMounted(async () => {
@@ -25,6 +30,30 @@ onMounted(async () => {
     formState.value = { ...settingsStore.settings };
   }
 });
+
+const getCurrentLocation = () => {
+  if (!navigator.geolocation) {
+    message.error("Trình duyệt không hỗ trợ Geolocation");
+    return;
+  }
+
+  message.loading("Đang lấy vị trí...", 1);
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      formState.value.latitude = parseFloat(
+        position.coords.latitude.toFixed(4),
+      );
+      formState.value.longitude = parseFloat(
+        position.coords.longitude.toFixed(4),
+      );
+      message.success("Đã cập nhật vị trí");
+    },
+    (error) => {
+      console.error(error);
+      message.error("Không thể lấy vị trí: " + error.message);
+    },
+  );
+};
 
 const onFinish = async (values) => {
   loading.value = true;
@@ -83,6 +112,38 @@ const onFinish = async (values) => {
             <a-select-option value="dark">Tối</a-select-option>
           </a-select>
         </a-form-item>
+      </div>
+
+      <a-divider orientation="left">Cấu hình Thời tiết</a-divider>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a-form-item label="Vĩ độ (Latitude)" name="latitude">
+          <a-input-number
+            v-model:value="formState.latitude"
+            class="w-full"
+            size="large"
+            :min="-90"
+            :max="90"
+            :step="0.0001"
+          />
+        </a-form-item>
+        <a-form-item label="Kinh độ (Longitude)" name="longitude">
+          <a-input-number
+            v-model:value="formState.longitude"
+            class="w-full"
+            size="large"
+            :min="-180"
+            :max="180"
+            :step="0.0001"
+          />
+        </a-form-item>
+      </div>
+
+      <div class="text-right mb-4">
+        <a-button @click="getCurrentLocation" size="middle">
+          <template #icon><EnvironmentOutlined /></template>
+          Lấy vị trí hiện tại của tôi
+        </a-button>
       </div>
 
       <a-form-item class="mt-4">

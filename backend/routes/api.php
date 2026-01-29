@@ -13,9 +13,10 @@ use Illuminate\Support\Facades\Route;
 // Public routes
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::get('/settings/public', [\App\Http\Controllers\Api\Admin\SystemSettingController::class, 'publicSettings']);
 
 // Protected routes
-Route::middleware(['auth:sanctum', 'user.active'])->group(function () {
+Route::middleware(['auth:sanctum', 'user.active', \App\Http\Middleware\CheckMaintenanceMode::class])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
@@ -98,13 +99,19 @@ Route::middleware(['auth:sanctum', 'user.active'])->group(function () {
 Route::middleware(['auth:sanctum', 'user.active', 'admin'])->prefix('admin')->group(function () {
     // User Management
     Route::get('/users', [\App\Http\Controllers\Api\Admin\UserController::class, 'index']);
+    Route::post('/users', [\App\Http\Controllers\Api\Admin\UserController::class, 'store']); // Create User
     Route::get('/users/{id}', [\App\Http\Controllers\Api\Admin\UserController::class, 'show']);
     Route::post('/users/{id}/block', [\App\Http\Controllers\Api\Admin\UserController::class, 'block']);
     Route::post('/users/{id}/unblock', [\App\Http\Controllers\Api\Admin\UserController::class, 'unblock']);
+    Route::post('/users/{id}/reset-password', [\App\Http\Controllers\Api\Admin\UserController::class, 'resetPassword']); // Reset Password
 
     // Master Data: Categories
     Route::apiResource('categories', \App\Http\Controllers\Api\Admin\CategoryController::class);
 
     // Master Data: Ingredients
     Route::apiResource('ingredients', \App\Http\Controllers\Api\Admin\IngredientController::class);
+
+    // System Settings
+    Route::get('/settings', [\App\Http\Controllers\Api\Admin\SystemSettingController::class, 'index']);
+    Route::post('/settings', [\App\Http\Controllers\Api\Admin\SystemSettingController::class, 'update']);
 });

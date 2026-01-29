@@ -27,4 +27,9 @@ export const authService = {
    * Get current user profile
    */
   getProfile: () => api.get("/auth/me"),
+
+  /**
+   * Get public system settings
+   */
+  getPublicSettings: () => api.get("/settings/public"),
 };

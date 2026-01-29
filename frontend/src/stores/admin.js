@@ -122,6 +122,37 @@ export const useAdminStore = defineStore("admin", () => {
     }
   };
 
+  const createUser = async (data) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      await adminUserService.createUser(data);
+      await fetchUsers(1); // Refresh list, go to first page
+      return true;
+    } catch (e) {
+      error.value = e.response?.data?.message || "Không thể tạo người dùng";
+      console.error("Failed to create user:", e);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const resetUserPassword = async (userId, password) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      await adminUserService.resetUserPassword(userId, password);
+      return true;
+    } catch (e) {
+      error.value = e.response?.data?.message || "Không thể đặt lại mật khẩu";
+      console.error("Failed to reset password:", e);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Category Management Actions
   const fetchCategories = async (page = 1) => {
     loading.value = true;
@@ -279,6 +310,8 @@ export const useAdminStore = defineStore("admin", () => {
     fetchUsers,
     blockUser,
     unblockUser,
+    createUser,
+    resetUserPassword,
 
     // Category Management
     categories,

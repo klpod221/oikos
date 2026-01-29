@@ -20,8 +20,7 @@ class UserController extends Controller
 {
     public function __construct(
         protected AdminUserService $userService
-    ) {
-    }
+    ) {}
 
     /**
      * List all users
@@ -97,6 +96,44 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User unblocked successfully',
             'data' => new UserResource($user),
+        ]);
+    }
+    /**
+     * Create a new user
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+            'role' => 'nullable|in:user,admin',
+        ]);
+
+        $user = $this->userService->createUser($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully',
+            'data' => new UserResource($user),
+        ], 201);
+    }
+
+    /**
+     * Reset user password
+     */
+    public function resetPassword(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $this->userService->getUser($id);
+        $this->userService->resetPassword($user, $validated['password']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User password has been reset successfully',
         ]);
     }
 }

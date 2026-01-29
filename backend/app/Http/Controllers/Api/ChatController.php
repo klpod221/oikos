@@ -26,8 +26,15 @@ class ChatController extends Controller
      * @param Request $request
      * @return StreamedResponse
      */
-    public function send(Request $request): StreamedResponse
+    public function send(Request $request): \Symfony\Component\HttpFoundation\Response
     {
+        if (\App\Models\SystemSetting::getValue('enable_ai_chat') === false) {
+            return response()->json([
+                'type' => 'error',
+                'message' => 'Tính năng AI Chat đang bị tắt.'
+            ], 403);
+        }
+
         $request->validate([
             'message' => 'required|string|max:5000',
         ]);

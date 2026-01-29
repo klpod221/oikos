@@ -46,6 +46,26 @@ export const adminUserService = {
   unblockUser(id) {
     return api.post(`/admin/users/${id}/unblock`);
   },
+
+  /**
+   * Create a new user
+   * @param {Object} data - User data
+   */
+  createUser(data) {
+    return api.post("/admin/users", data);
+  },
+
+  /**
+   * Reset user password
+   * @param {number} id - User ID
+   * @param {string} password - New password
+   */
+  resetUserPassword(id, password) {
+    return api.post(`/admin/users/${id}/reset-password`, {
+      password,
+      password_confirmation: password,
+    });
+  },
 };
 
 // Category Management APIs
@@ -149,5 +169,23 @@ export const adminIngredientService = {
    */
   deleteIngredient(id) {
     return api.delete(`/admin/ingredients/${id}`);
+  },
+};
+
+// System Settings APIs
+export const adminSettingService = {
+  /**
+   * Get all system settings
+   */
+  getSettings() {
+    return api.get("/admin/settings");
+  },
+
+  /**
+   * Update system settings
+   * @param {Object} data - Payload { settings: [] }
+   */
+  updateSettings(data) {
+    return api.post("/admin/settings", data);
   },
 };

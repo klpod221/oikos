@@ -15,6 +15,12 @@ const routes = [
     meta: { guest: true },
   },
   {
+    path: "/maintenance",
+    name: "Maintenance",
+    component: () => import("../views/Maintenance.vue"),
+    meta: { guest: true, noLayoutPadding: true },
+  },
+  {
     path: "/",
     name: "Dashboard",
     component: () => import("../views/dashboard/Dashboard.vue"),
@@ -60,6 +66,12 @@ const routes = [
     path: "/admin/ingredients",
     name: "AdminIngredients",
     component: () => import("../views/admin/Ingredients.vue"),
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: "/admin/settings",
+    name: "AdminSettings",
+    component: () => import("../views/admin/SystemSettings.vue"),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
   {

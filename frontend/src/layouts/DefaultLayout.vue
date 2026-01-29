@@ -28,6 +28,7 @@ import {
   CoffeeOutlined,
   TrophyOutlined,
   RobotOutlined,
+  ControlOutlined,
 } from "@ant-design/icons-vue";
 
 const router = useRouter();
@@ -86,6 +87,11 @@ const adminMenuItems = [
     key: "/admin/ingredients",
     icon: CoffeeOutlined,
     label: "Quản lý nguyên liệu",
+  },
+  {
+    key: "/admin/settings",
+    icon: ControlOutlined,
+    label: "Cài đặt hệ thống",
   },
 ];
 
@@ -249,8 +255,10 @@ const toggleSidebar = () => {
               </div>
               <div class="text-xs text-slate-500">{{ auth.user?.email }}</div>
             </div>
-            <a-avatar :size="36" class="bg-blue-500">
-              <template #icon><UserOutlined /></template>
+            <a-avatar :size="36" :src="auth.user?.avatar" class="bg-blue-500">
+              <template #icon v-if="!auth.user?.avatar"
+                ><UserOutlined
+              /></template>
             </a-avatar>
           </div>
           <template #overlay>

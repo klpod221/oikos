@@ -64,12 +64,16 @@ class AuthService
      */
     public function register(array $data, ?string $deviceName = null): array
     {
+        $role = \App\Models\SystemSetting::getValue('default_user_role', User::ROLE_USER);
+        $requireVerification = \App\Models\SystemSetting::getValue('require_email_verification', false);
+        $status = $requireVerification ? User::STATUS_PENDING : User::STATUS_ACTIVE;
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => User::ROLE_USER,
-            'status' => User::STATUS_ACTIVE,
+            'role' => $role,
+            'status' => $status,
         ]);
 
         $deviceName = $deviceName ?? 'web';

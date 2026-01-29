@@ -18,8 +18,7 @@ class ExternalDataController extends Controller
 {
     public function __construct(
         protected ExternalDataService $externalDataService
-    ) {
-    }
+    ) {}
 
     /**
      * Get External Data
@@ -37,8 +36,20 @@ class ExternalDataController extends Controller
             'lon' => 'sometimes|numeric|between:-180,180',
         ]);
 
-        $lat = $request->input('lat', 21.0285); // Default: Hanoi
-        $lon = $request->input('lon', 105.8542);
+        $lat = $request->input('lat');
+        $lon = $request->input('lon');
+
+        if (!$lat || !$lon) {
+            $user = $request->user();
+            if ($user && $user->settings) {
+                $lat = $lat ?? $user->settings->latitude;
+                $lon = $lon ?? $user->settings->longitude;
+            }
+        }
+
+        // Default: Hanoi
+        $lat = $lat ?? 21.0285;
+        $lon = $lon ?? 105.8542;
 
         $data = $this->externalDataService->getAllData($lat, $lon);
 

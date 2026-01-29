@@ -182,20 +182,22 @@ class ExternalDataService
                 if ($goldPrice || $silverPrice) {
                     return [
                         'gold' => [
-                            'price' => $goldPrice,
-                            'unit' => 'lượng',
+                            'price' => $goldPrice, // API returns price per only (chỉ) for Gold (~19m)
+                            'unit' => 'chỉ',
                             'currency' => 'VND',
                             'source' => 'BTMC',
                         ],
                         'silver' => [
-                            'price' => $silverPrice,
-                            'unit' => 'lượng',
+                            'price' => $silverPrice ? $silverPrice / 10 : null, // API returns per tael (lượng) for Silver (~4.5m), convert to chỉ
+                            'unit' => 'chỉ',
                             'currency' => 'VND',
                             'source' => 'BTMC',
                         ],
                         'updated_at' => now()->toIsoString(),
                     ];
                 }
+            } else {
+                Log::warning('BTMC API returned unsuccessful response: ' . $response->status());
             }
         } catch (\Exception $e) {
             Log::warning('BTMC Gold API error: ' . $e->getMessage());

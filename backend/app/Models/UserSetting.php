@@ -39,6 +39,8 @@ class UserSetting extends Model
         'silver_unit',
         'language',
         'theme',
+        'latitude',
+        'longitude',
     ];
 
     /**

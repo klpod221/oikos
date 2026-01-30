@@ -16,6 +16,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::get('/auth/google/url', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'getAuthUrl']);
 Route::post('/auth/google/callback', [\App\Http\Controllers\Api\Auth\GoogleAuthController::class, 'callback']);
 Route::get('/settings/public', [\App\Http\Controllers\Api\Admin\SystemSettingController::class, 'publicSettings']);
+Route::get('/health', [\App\Http\Controllers\HealthController::class, 'index']);
 
 // Protected routes
 Route::middleware(['auth:sanctum', 'user.active', \App\Http\Middleware\CheckMaintenanceMode::class])->group(function () {

@@ -18,7 +18,7 @@ class GmailService
     /**
      * Get the latest bank notification emails.
      */
-    public function getBankEmails(User $user, int $limit = 10, ?\Carbon\Carbon $since = null)
+    public function getBankEmails(User $user, int $limit = 10, ?\Carbon\Carbon $since = null, ?string $pageToken = null)
     {
         // Get query from System Settings or fallback
         $query = \App\Models\SystemSetting::getValue('gmail_search_query', 'subject:(biến động số dư) OR subject:(giao dịch) OR subject:(transaction) OR subject:(biên lai) OR subject:(transfer) OR subject:(receipt) -category:promotions -category:social');
@@ -33,17 +33,25 @@ class GmailService
             'maxResults' => $limit,
         ];
 
+        if ($pageToken) {
+            $params['pageToken'] = $pageToken;
+        }
+
         $list = $this->callApi($user, 'GET', '/messages', $params);
 
         if (!isset($list['messages'])) {
-            return [];
+            return [
+                'messages' => [],
+                'nextPageToken' => null
+            ];
         }
 
         $emails = [];
         foreach ($list['messages'] as $msg) {
             // Check if transaction with this Message ID already exists to avoid API call
-            // Wait, we need to check DB here? Or let the caller check?
-            // To be efficient, we should check DB before fetching details.
+            // We rely on deduplication in the calling command, but checking here saves API quota.
+            // However, ensuring we don't return "empty" prematurely requires care.
+
             if (\App\Models\Transaction::where('gmail_message_id', $msg['id'])->exists()) {
                 continue;
             }
@@ -59,7 +67,10 @@ class GmailService
             }
         }
 
-        return $emails;
+        return [
+            'messages' => $emails,
+            'nextPageToken' => $list['nextPageToken'] ?? null
+        ];
     }
 
     /**

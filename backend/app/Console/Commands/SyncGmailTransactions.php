@@ -43,29 +43,33 @@ class SyncGmailTransactions extends Command
 
                 $this->info("Fetching emails since: " . $since->toDateTimeString());
 
-                // Fetch emails
-                $emails = $gmailService->getBankEmails($user, 20, $since);
+                $pageToken = null;
+                $pageCount = 0;
+                $maxPages = 5; // Safety limit to prevent timeouts in one run (e.g. 100 emails max)
 
-                $this->info("Found " . count($emails) . " relevant emails.");
+                do {
+                    $pageCount++;
+                    // Fetch emails with pagination
+                    $result = $gmailService->getBankEmails($user, 20, $since, $pageToken);
+                    $emails = $result['messages'];
+                    $pageToken = $result['nextPageToken'];
 
-                if (empty($emails)) {
-                    continue;
-                }
+                    $this->info("Page $pageCount: Found " . count($emails) . " new relevant emails.");
 
-                $count = 0;
-                foreach ($emails as $email) {
-                    // Deduplication check
-                    if (Transaction::where('gmail_message_id', $email['message_id'])->exists()) {
-                        continue;
-                    }
+                    if (!empty($emails)) {
+                        foreach ($emails as $email) {
+                            // Deduplication check (Double check, though Service also checks)
+                            if (Transaction::where('gmail_message_id', $email['message_id'])->exists()) {
+                                continue;
+                            }
 
-                    $this->info("Processing Email: {$email['subject']}");
+                            $this->info("Processing Email: {$email['subject']}");
 
-                    // Determine Today's Date for AI context
-                    $today = now()->format('Y-m-d');
+                            // Determine Today's Date for AI context
+                            $today = now()->format('Y-m-d');
 
-                    // Construct Prompt for AI Agent
-                    $systemPrompt = <<<PROMPT
+                            // Construct Prompt for AI Agent
+                            $systemPrompt = <<<PROMPT
 You are an intelligent Financial Assistant. Your task is to process a bank notification email and create a transaction record in the system.
 
 1. **Analyze** the email content provided by the user.
@@ -84,7 +88,7 @@ You are an intelligent Financial Assistant. Your task is to process a bank notif
    - If you cannot determine the details, do nothing or log a warning.
 PROMPT;
 
-                    $userMessage = <<<MSG
+                            $userMessage = <<<MSG
 Email Subject: {$email['subject']}
 Email Date: {$email['date']}
 Email Snippet: {$email['snippet']}
@@ -96,47 +100,40 @@ Message ID: {$email['message_id']}
 Please create a transaction for this email.
 MSG;
 
-                    // Execute AI Agent
-                    $response = $chatService->runWithTools($user->id, $systemPrompt, $userMessage);
+                            // Execute AI Agent
+                            $response = $chatService->runWithTools($user->id, $systemPrompt, $userMessage);
 
-                    // We assume if the AI successfully called the tool, the transaction is created.
-                    // We can mark this email as processed by saving the ID to DB explicitly here if the tool didn't do it?
-                    // But wait, the deduplication relies on `gmail_message_id` being in the `transactions` table.
-                    // The `create_transaction` tool DOES NOT currently accept `gmail_message_id`.
-                    // PROBLEM: The AI Tool `create_transaction` likely only takes standard fields (amount, description, etc).
-                    // FIX: We need to either:
-                    // A) Update `CreateTransactionTool` to accept `gmail_message_id`.
-                    // B) Manually update the transaction after AI creates it (unsafe, race condition).
-                    // C) Pass `metadata` to `create_transaction` if it supports it.
+                            $this->info("AI Response: " . substr($response, 0, 100));
 
-                    // Let's assume for now we must update the tool to support metadata or specific ID.
-                    // OR, since the user insists on AI doing it, we should check `CreateTransactionTool`.
+                            // Manual Linkage Hack (if tools didn't handle ID)
+                            $latestTx = Transaction::where('user_id', $user->id)
+                                ->latest()
+                                ->first();
 
-                    $this->info("AI Response: " . substr($response, 0, 100));
-
-                    // Hack: Since standard `CreateTransactionTool` might not support `gmail_message_id`,
-                    // We will attempt to find the LAST created transaction by this user matching the amount/date
-                    // and update its `gmail_message_id`.
-                    // This is imperfect but works without modifying the Tool core logic immediately.
-                    // BETTER: Let's assume the user wants us to Modify the Tool as well?
-
-                    // Let's try to update the `gmail_message_id` manually after AI runs.
-                    // We can find the transaction created within the last 5 seconds?
-                    $latestTx = Transaction::where('user_id', $user->id)
-                        ->latest()
-                        ->first();
-
-                    if ($latestTx && $latestTx->created_at->diffInSeconds(now()) < 10) {
-                        $latestTx->update(['gmail_message_id' => $email['message_id']]);
-                        $count++;
-                        $this->info("Transaction created and linked to Email ID.");
-                    } else {
-                        $this->warn("AI processed the email, but no new transaction was detected (or AI chose to skip).");
-                        // If AI failed, we still mark it? No, retry next time.
+                            if ($latestTx && $latestTx->created_at->diffInSeconds(now()) < 15) {
+                                $latestTx->update(['gmail_message_id' => $email['message_id']]);
+                                $this->info("Transaction created and linked to Email ID.");
+                            } else {
+                                $this->warn("AI processing check: No new transaction detected immediately.");
+                            }
+                        }
                     }
-                }
 
-                $user->update(['last_gmail_sync_at' => now()]);
+                    // Break if max pages reached
+                    if ($pageCount >= $maxPages) {
+                        $this->warn("Max pages reached ($maxPages). Stopping sync for now.");
+                        break;
+                    }
+                } while ($pageToken);
+
+                // Only update the sync timestamp if we successfully processed everything (nextPageToken is null)
+                // and we didn't hit the max pages limit (which leaves work unfinished)
+                if ($pageToken === null && $pageCount < $maxPages) {
+                    $user->update(['last_gmail_sync_at' => now()]);
+                    $this->info("Sync fully completed. Updated last_gmail_sync_at.");
+                } else {
+                    $this->info("Sync partial or limited. Keeping old timestamp to resume next time.");
+                }
             } catch (\Exception $e) {
                 Log::error("Gmail Sync Failed: " . $e->getMessage());
                 $this->error($e->getMessage());

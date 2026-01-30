@@ -202,22 +202,13 @@ const handleSend = async (content) => {
           class="flex flex-col items-center justify-center py-12 text-center"
         >
           <div
-            class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4"
+            class="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-gray-100 p-2"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-8 h-8 text-emerald-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-              />
-            </svg>
+            <img
+              src="/logo.png"
+              alt="OikOS"
+              class="w-full h-full object-contain"
+            />
           </div>
           <h2 class="text-xl font-semibold text-gray-800 mb-2">Xin chào! 👋</h2>
           <p class="text-gray-500 mb-6 max-w-md">

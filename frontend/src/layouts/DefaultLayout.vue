@@ -30,6 +30,7 @@ import {
   RobotOutlined,
   ControlOutlined,
 } from "@ant-design/icons-vue";
+import GlobalChatBubble from "../components/chat/GlobalChatBubble.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -292,6 +293,7 @@ const toggleSidebar = () => {
         <slot v-else />
       </a-layout-content>
     </a-layout>
+    <GlobalChatBubble />
   </a-layout>
 </template>
 

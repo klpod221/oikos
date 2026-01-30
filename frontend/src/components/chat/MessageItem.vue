@@ -53,9 +53,9 @@ const formatTime = (isoString) => {
     <div class="shrink-0 mt-1">
       <div
         v-if="msg.role === 'assistant'"
-        class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white shadow-sm"
+        class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-gray-100 p-0.5"
       >
-        <RobotOutlined />
+        <img src="/logo.png" alt="OikOS" class="w-full h-full object-contain" />
       </div>
       <a-avatar
         v-else

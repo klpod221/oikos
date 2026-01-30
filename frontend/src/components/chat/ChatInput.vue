@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { SendOutlined, LoadingOutlined } from "@ant-design/icons-vue";
 
 const props = defineProps({
@@ -18,11 +18,18 @@ const adjustTextareaHeight = () => {
   el.style.height = Math.min(el.scrollHeight, 150) + "px";
 };
 
-const handleSend = () => {
+const handleSend = async () => {
   if (!input.value.trim() || props.loading) return;
   emit("send", input.value);
   input.value = "";
   adjustTextareaHeight();
+
+  // Responsive Focus Logic
+  await nextTick();
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  if (!isMobile) {
+    textareaRef.value?.focus();
+  }
 };
 
 const handleKeydown = (e) => {

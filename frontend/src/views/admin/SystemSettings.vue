@@ -180,7 +180,7 @@ onMounted(() => {
         </a-form-item>
         <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-700">
           <strong>Lưu ý:</strong> Thay đổi query sẽ ảnh hưởng đến lần quét tiếp
-          theo (mỗi 5 phút).
+          theo (mỗi 10 phút).
         </div>
       </a-form>
     </a-card>

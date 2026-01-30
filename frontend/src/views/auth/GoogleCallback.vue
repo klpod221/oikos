@@ -53,7 +53,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-slate-50">
+  <div class="h-[50vh] flex items-center justify-center bg-slate-50">
     <div class="text-center">
       <a-spin size="large" />
       <p class="mt-4 text-slate-500">Đang xác thực với Google...</p>

@@ -77,7 +77,7 @@ const connectGoogle = async () => {
       <h4 class="font-bold text-blue-700 mb-2">Hướng dẫn:</h4>
       <ul class="list-disc list-inside text-sm text-blue-600 space-y-1">
         <li>Kết nối tài khoản Google để tự động đọc email thông báo số dư.</li>
-        <li>Hệ thống sẽ tự động quét email mỗi 5 phút.</li>
+        <li>Hệ thống sẽ tự động quét email mỗi 10 phút.</li>
         <li>
           Hỗ trợ: Vietcombank, Techcombank, VPBank (Tiêu đề: "Biến động số dư",
           "Biên lai chuyển tiền").

@@ -86,6 +86,12 @@ const routes = [
     component: () => import("../views/chat/Chat.vue"),
     meta: { requiresAuth: true, noLayoutPadding: true },
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("../views/NotFound.vue"),
+    meta: { guest: true, noLayoutPadding: true },
+  },
 ];
 
 const router = createRouter({

@@ -14,10 +14,8 @@ app.use(pinia);
 app.use(router);
 app.use(Antd);
 
-// Auto-fetch user if token exists
-const auth = useAuthStore();
-if (auth.token) {
-  auth.fetchUser();
-}
+app.use(Antd);
+
+// Auth fetch is handled in App.vue to prevent flash of content
 
 app.mount("#app");

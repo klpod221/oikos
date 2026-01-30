@@ -1,0 +1,155 @@
+services:
+  # === DATABASE ===
+  postgres:
+    image: postgres:16-alpine
+    container_name: oikos_postgres
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-oikos}
+      POSTGRES_USER: ${DB_USERNAME:-oikos}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-oikos} -d ${DB_DATABASE:-oikos}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - oikos-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: oikos_redis
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      - oikos-network
+
+  # === PROXY SERVICE ===
+  cli-proxy:
+    image: eceasy/cli-proxy-api:latest
+    container_name: oikos_cli_proxy
+    volumes:
+      - ./cli-proxy-config.yaml:/CLIProxyAPI/config.yaml
+      - ./cli-proxy-auth:/root/.cli-proxy-api
+    restart: unless-stopped
+    networks:
+      - oikos-network
+
+  # === APPLICATION ===
+  backend:
+    image: oikos-backend:prod
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: oikos_backend
+    environment:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-oikos}
+      DB_USERNAME: ${DB_USERNAME:-oikos}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_HOST: redis
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      OPENAI_API_URL: http://cli-proxy:8317/v1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      cli-proxy:
+        condition: service_started
+    restart: always
+    networks:
+      - oikos-network
+
+  queue:
+    image: oikos-backend:prod
+    container_name: oikos_queue
+    command: php artisan queue:work --tries=3 --timeout=90
+    environment:
+      APP_ENV: production
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-oikos}
+      DB_USERNAME: ${DB_USERNAME:-oikos}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_HOST: redis
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      OPENAI_API_URL: http://cli-proxy:8317/v1
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      cli-proxy:
+        condition: service_started
+    restart: always
+    networks:
+      - oikos-network
+
+  scheduler:
+    image: oikos-backend:prod
+    container_name: oikos_scheduler
+    command: php artisan schedule:work
+    environment:
+      APP_ENV: production
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE:-oikos}
+      DB_USERNAME: ${DB_USERNAME:-oikos}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      REDIS_HOST: redis
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      OPENAI_API_URL: http://cli-proxy:8317/v1
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: always
+    networks:
+      - oikos-network
+
+  frontend:
+    image: oikos-frontend:prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: oikos_frontend
+    ports:
+      - "8090:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: always
+    networks:
+      - oikos-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  oikos-network:
+    driver: bridge

@@ -1,0 +1,1 @@
+-keep class com.oikos.app.notification_listener.** { *; }

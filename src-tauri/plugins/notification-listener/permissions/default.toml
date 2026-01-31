@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "default"
+description = "Default permissions for the notification listener"
+commands = ["check_permission", "open_settings"]

@@ -55,18 +55,7 @@ export const useChatStore = defineStore("chat", () => {
           messages.value = [...history, ...messages.value];
         } else {
           // If fresh load and empty, add welcome message
-          if (history.length === 0) {
-            messages.value = [
-              {
-                id: "welcome",
-                role: "assistant",
-                content: "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
-              },
-            ];
-            hasMore.value = false;
-          } else {
             messages.value = history;
-          }
         }
       }
     } catch (error) {

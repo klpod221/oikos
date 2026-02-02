@@ -55,6 +55,7 @@ class Transaction extends Model
         'transaction_date',
         'reference',
         'metadata',
+        'gmail_message_id',
     ];
 
     /**

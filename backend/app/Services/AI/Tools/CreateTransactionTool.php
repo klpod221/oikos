@@ -59,6 +59,10 @@ class CreateTransactionTool extends AITool
                     'type' => 'string',
                     'description' => 'Transaction date in YYYY-MM-DD format.',
                 ],
+                'gmail_message_id' => [
+                    'type' => 'string',
+                    'description' => 'Gmail Message ID if this transaction is from an email. CRITICAL for deduplication.',
+                ],
             ],
             'required' => ['amount', 'type', 'category', 'wallet'],
         ];
@@ -73,6 +77,7 @@ class CreateTransactionTool extends AITool
             $categoryName = $arguments['category'] ?? null;
             $walletName = $arguments['wallet'] ?? null;
             $date = $arguments['date'] ?? now()->toDateString();
+            $gmailMessageId = $arguments['gmail_message_id'] ?? null;
 
             if ($amount <= 0) {
                 return [
@@ -108,6 +113,7 @@ class CreateTransactionTool extends AITool
                 'type' => $type,
                 'description' => $note,
                 'transaction_date' => $date,
+                'gmail_message_id' => $gmailMessageId,
             ]);
 
             $typeLabel = $type === 'income' ? 'income' : 'expense';

@@ -27,7 +27,7 @@ const netSavingsColor = computed(() => {
 <template>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
     <!-- Total Income -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-6">
       <div class="flex items-center justify-between mb-3 sm:mb-4">
         <span class="text-slate-500 text-xs sm:text-sm">Tổng thu nhập</span>
         <div
@@ -45,7 +45,7 @@ const netSavingsColor = computed(() => {
     </div>
 
     <!-- Total Expense -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-6">
       <div class="flex items-center justify-between mb-3 sm:mb-4">
         <span class="text-slate-500 text-xs sm:text-sm">Tổng chi tiêu</span>
         <div
@@ -57,11 +57,13 @@ const netSavingsColor = computed(() => {
       <div class="text-base sm:text-lg lg:text-2xl font-bold text-slate-800">
         {{ formatCurrency(summary.total_expense, "VND") }}
       </div>
-      <div class="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">Đã chi trong kỳ này</div>
+      <div class="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+        Đã chi trong kỳ này
+      </div>
     </div>
 
     <!-- Net Savings -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-6">
       <div class="flex items-center justify-between mb-3 sm:mb-4">
         <span class="text-slate-500 text-xs sm:text-sm">Tiết kiệm ròng</span>
         <div
@@ -84,7 +86,7 @@ const netSavingsColor = computed(() => {
     </div>
 
     <!-- Transaction Count -->
-    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-6">
       <div class="flex items-center justify-between mb-3 sm:mb-4">
         <span class="text-slate-500 text-xs sm:text-sm">Giao dịch</span>
         <div
@@ -96,7 +98,9 @@ const netSavingsColor = computed(() => {
       <div class="text-base sm:text-lg lg:text-2xl font-bold text-slate-800">
         {{ summary.transaction_count }}
       </div>
-      <div class="text-blue-600 text-xs sm:text-sm mt-1 sm:mt-2">Tổng số lượng</div>
+      <div class="text-blue-600 text-xs sm:text-sm mt-1 sm:mt-2">
+        Tổng số lượng
+      </div>
     </div>
   </div>
 </template>

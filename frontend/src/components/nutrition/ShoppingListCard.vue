@@ -50,7 +50,7 @@ function formatDate(dateString) {
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md transition-shadow"
+    class="bg-white border border-slate-200 rounded-xl p-2 hover:shadow-md transition-shadow"
   >
     <div class="flex items-start justify-between mb-3">
       <div class="flex items-center gap-2">

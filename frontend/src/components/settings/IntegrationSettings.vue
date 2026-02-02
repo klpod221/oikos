@@ -40,7 +40,7 @@ const connectGoogle = async () => {
   <div class="space-y-6">
     <!-- Google Connection Status -->
     <div
-      class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200"
+      class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200"
     >
       <div class="flex items-center gap-3">
         <GoogleOutlined class="text-2xl text-red-500" />
@@ -52,12 +52,6 @@ const connectGoogle = async () => {
           <p class="text-sm text-slate-500" v-else>Chưa kết nối</p>
         </div>
       </div>
-      <a-tag color="success" class="flex items-center gap-2 px-3 py-1">
-        <template #icon>
-          <SyncOutlined spin />
-        </template>
-        Tự động đồng bộ mỗi 10 phút
-      </a-tag>
       <a-button
         v-if="!auth.user.google_id"
         type="primary"
@@ -73,7 +67,7 @@ const connectGoogle = async () => {
     </div>
 
     <!-- Instructions -->
-    <div class="bg-blue-50 p-4 rounded-lg">
+    <div class="bg-blue-50 p-2 rounded-lg">
       <h4 class="font-bold text-blue-700 mb-2">Hướng dẫn:</h4>
       <ul class="list-disc list-inside text-sm text-blue-600 space-y-1">
         <li>Kết nối tài khoản Google để tự động đọc email thông báo số dư.</li>

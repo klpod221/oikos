@@ -17,6 +17,7 @@ import {
   BarChartOutlined,
   HeartOutlined,
   ApiOutlined,
+  BellOutlined,
 } from "@ant-design/icons-vue";
 
 // Form Components
@@ -26,8 +27,17 @@ import PasswordForm from "../../components/settings/PasswordForm.vue";
 import UserStatsForm from "../../components/settings/UserStatsForm.vue";
 import UserGoalsForm from "../../components/settings/UserGoalsForm.vue";
 import IntegrationSettings from "../../components/settings/IntegrationSettings.vue";
+import NotificationSettings from "./NotificationSettings.vue"; // Relative import since in same folder
 
 const activeKey = ref("profile");
+const isAndroid = ref(false);
+
+import { onMounted } from "vue";
+onMounted(() => {
+  if (window.AndroidNotification) {
+    isAndroid.value = true;
+  }
+});
 </script>
 
 <template>
@@ -123,7 +133,7 @@ const activeKey = ref("profile");
             <span class="hidden sm:inline">Tùy chọn</span>
           </span>
         </template>
-        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+        <div class="bg-white border border-slate-200 rounded-xl p-2 lg:p-6">
           <h2 class="text-lg font-semibold text-slate-800 mb-4">
             Tùy chọn ứng dụng
           </h2>
@@ -139,7 +149,7 @@ const activeKey = ref("profile");
             <span class="hidden sm:inline">Bảo mật</span>
           </span>
         </template>
-        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+        <div class="bg-white border border-slate-200 rounded-xl p-2 lg:p-6">
           <h2 class="text-lg font-semibold text-slate-800 mb-4">
             Đổi mật khẩu
           </h2>
@@ -154,11 +164,24 @@ const activeKey = ref("profile");
             <span class="hidden sm:inline">Kết nối</span>
           </span>
         </template>
-        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+        <div class="bg-white border border-slate-200 rounded-xl p-2 lg:p-6">
           <h2 class="text-lg font-semibold text-slate-800 mb-4">
             Kết nối tài khoản
           </h2>
           <IntegrationSettings />
+        </div>
+      </a-tab-pane>
+
+      <!-- Notification Tab (Android Only) -->
+      <a-tab-pane key="notifications" v-if="isAndroid">
+        <template #tab>
+          <span class="flex items-center gap-2">
+            <BellOutlined />
+            <span class="hidden sm:inline">Thông báo</span>
+          </span>
+        </template>
+        <div class="bg-white border border-slate-200 rounded-xl p-2 lg:p-6">
+          <NotificationSettings />
         </div>
       </a-tab-pane>
     </a-tabs>

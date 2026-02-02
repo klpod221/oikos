@@ -43,23 +43,30 @@ const form = defineModel("form", {
 });
 
 // Helper validation (ensure ingredients array exists)
-watch(() => props.open, (val) => {
+watch(
+  () => props.open,
+  (val) => {
     if (val && !form.value.ingredients) {
-        form.value.ingredients = [];
+      form.value.ingredients = [];
     }
     // If editing, map pivot data if available
     if (val && props.recipe && props.recipe.ingredients) {
-        form.value.ingredients = props.recipe.ingredients.map(i => ({
-            id: i.id,
-            quantity: Number(i.pivot?.quantity || 0),
-            unit: i.pivot?.unit || i.unit,
-        }));
+      form.value.ingredients = props.recipe.ingredients.map((i) => ({
+        id: i.id,
+        quantity: Number(i.pivot?.quantity || 0),
+        unit: i.pivot?.unit || i.unit,
+      }));
     }
-}, { immediate: true });
-
+  },
+  { immediate: true },
+);
 
 const ingredientOptions = computed(() => {
-  return props.ingredients.map(i => ({ value: i.id, label: i.name, unit: i.unit }));
+  return props.ingredients.map((i) => ({
+    value: i.id,
+    label: i.name,
+    unit: i.unit,
+  }));
 });
 
 const filterOption = (input, option) => {
@@ -67,19 +74,19 @@ const filterOption = (input, option) => {
 };
 
 const handleIngredientChange = (index, id) => {
-    const ing = props.ingredients.find(i => i.id === id);
-    if (ing) {
-        form.value.ingredients[index].unit = ing.unit;
-    }
+  const ing = props.ingredients.find((i) => i.id === id);
+  if (ing) {
+    form.value.ingredients[index].unit = ing.unit;
+  }
 };
 
 const addIngredient = () => {
-    if (!form.value.ingredients) form.value.ingredients = [];
-    form.value.ingredients.push({ id: null, quantity: 1, unit: '' });
+  if (!form.value.ingredients) form.value.ingredients = [];
+  form.value.ingredients.push({ id: null, quantity: 1, unit: "" });
 };
 
 const removeIngredient = (index) => {
-    form.value.ingredients.splice(index, 1);
+  form.value.ingredients.splice(index, 1);
 };
 
 const handleOk = () => {
@@ -124,7 +131,7 @@ const handleOk = () => {
 
         <!-- Right Column: Details & Ingredients -->
         <div>
-           <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-3 gap-2">
             <a-form-item label="Khẩu phần">
               <a-input-number
                 v-model:value="form.servings"
@@ -148,44 +155,73 @@ const handleOk = () => {
             </a-form-item>
           </div>
 
-           <a-divider style="margin: 12px 0">Dinh dưỡng (mỗi khẩu phần)</a-divider>
-           <div class="grid grid-cols-4 gap-2">
+          <a-divider style="margin: 12px 0"
+            >Dinh dưỡng (mỗi khẩu phần)</a-divider
+          >
+          <div class="grid grid-cols-4 gap-2">
             <a-form-item label="Calo">
-              <a-input-number v-model:value="form.calories" :min="0" class="w-full!" />
+              <a-input-number
+                v-model:value="form.calories"
+                :min="0"
+                class="w-full!"
+              />
             </a-form-item>
             <a-form-item label="Đạm (g)">
-              <a-input-number v-model:value="form.protein" :min="0" class="w-full!" />
+              <a-input-number
+                v-model:value="form.protein"
+                :min="0"
+                class="w-full!"
+              />
             </a-form-item>
             <a-form-item label="Carb (g)">
-              <a-input-number v-model:value="form.carbs" :min="0" class="w-full!" />
+              <a-input-number
+                v-model:value="form.carbs"
+                :min="0"
+                class="w-full!"
+              />
             </a-form-item>
             <a-form-item label="Béo (g)">
-              <a-input-number v-model:value="form.fat" :min="0" class="w-full!" />
+              <a-input-number
+                v-model:value="form.fat"
+                :min="0"
+                class="w-full!"
+              />
             </a-form-item>
           </div>
 
           <a-divider style="margin: 12px 0">Nguyên liệu</a-divider>
-          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-             <div v-for="(item, index) in form.ingredients" :key="index" class="flex gap-2 mb-2 items-start">
-              <a-select 
-                  v-model:value="item.id" 
-                  show-search
-                  placeholder="Chọn nguyên liệu" 
-                  :options="ingredientOptions"
-                  :filter-option="filterOption"
-                  class="flex-1"
-                  @change="handleIngredientChange(index, $event)"
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+            <div
+              v-for="(item, index) in form.ingredients"
+              :key="index"
+              class="flex gap-2 mb-2 items-start"
+            >
+              <a-select
+                v-model:value="item.id"
+                show-search
+                placeholder="Chọn nguyên liệu"
+                :options="ingredientOptions"
+                :filter-option="filterOption"
+                class="flex-1"
+                @change="handleIngredientChange(index, $event)"
               >
               </a-select>
-              <a-input-number 
-                  v-model:value="item.quantity" 
-                  placeholder="SL" 
-                  :min="0" 
-                  class="w-20!" 
+              <a-input-number
+                v-model:value="item.quantity"
+                placeholder="SL"
+                :min="0"
+                class="w-20!"
               />
-              <span class="leading-[32px] text-slate-500 w-8 text-xs">{{ item.unit || '...' }}</span>
-              <a-button danger size="small" type="text" @click="removeIngredient(index)">
-                  <template #icon><DeleteOutlined /></template>
+              <span class="leading-[32px] text-slate-500 w-8 text-xs">{{
+                item.unit || "..."
+              }}</span>
+              <a-button
+                danger
+                size="small"
+                type="text"
+                @click="removeIngredient(index)"
+              >
+                <template #icon><DeleteOutlined /></template>
               </a-button>
             </div>
             <a-button type="dashed" block @click="addIngredient" class="mt-2">

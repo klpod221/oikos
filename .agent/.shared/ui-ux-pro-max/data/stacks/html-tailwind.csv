@@ -21,7 +21,7 @@ No,Category,Guideline,Description,Do,Don't,Code Good,Code Bad,Severity,Docs URL
 20,Colors,Opacity utilities,Use color opacity utilities,bg-black/50 text-white/80,Separate opacity class,bg-black/50,bg-black opacity-50,Low,https://tailwindcss.com/docs/background-color
 21,Colors,Dark mode,Support dark mode with dark: prefix,dark:bg-gray-900 dark:text-white,No dark mode support,dark:bg-gray-900,Only light theme,Medium,https://tailwindcss.com/docs/dark-mode
 22,Colors,Semantic colors,Use semantic color naming in config,primary secondary danger success,Generic color names in components,bg-primary,bg-blue-500 everywhere,Medium,
-23,Spacing,Consistent spacing scale,Use Tailwind spacing scale consistently,p-4 m-6 gap-8,Arbitrary pixel values,p-4 (1rem),p-[15px],Low,https://tailwindcss.com/docs/customizing-spacing
+23,Spacing,Consistent spacing scale,Use Tailwind spacing scale consistently,p-2 m-6 gap-8,Arbitrary pixel values,p-2 (1rem),p-[15px],Low,https://tailwindcss.com/docs/customizing-spacing
 24,Spacing,Negative margins,Use sparingly for overlapping effects,-mt-4 for overlapping elements,Negative margins for layout fixing,-mt-8 for card overlap,-m-2 to fix spacing issues,Medium,
 25,Spacing,Space between,Use space-y-* for vertical lists,space-y-4 on flex/grid column,Margin on each child,space-y-4,Each child has mb-4,Low,https://tailwindcss.com/docs/space
 26,Forms,Focus states,Always show focus indicators,focus:ring-2 focus:ring-blue-500,Remove focus outline,focus:ring-2 focus:ring-offset-2,focus:outline-none (no replacement),High,

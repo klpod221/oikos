@@ -31,7 +31,7 @@ const formatStatus = (status) => {
 </script>
 
 <template>
-  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5">
+  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-5">
     <div class="flex items-start justify-between mb-2 sm:mb-3">
       <div
         class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-xl sm:text-2xl"
@@ -72,7 +72,9 @@ const formatStatus = (status) => {
         </a-dropdown>
       </div>
     </div>
-    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">{{ goal.name }}</h3>
+    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">
+      {{ goal.name }}
+    </h3>
     <p class="text-xs sm:text-sm text-slate-500 mb-2 sm:mb-3">
       {{ goal.description || "Không có mô tả" }}
     </p>

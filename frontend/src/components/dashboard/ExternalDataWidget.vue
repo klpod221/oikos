@@ -73,7 +73,7 @@ onMounted(() => {
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
     <!-- Weather -->
     <div
-      class="bg-linear-to-br from-blue-500 to-blue-600 text-white rounded-xl p-3 sm:p-4"
+      class="bg-linear-to-br from-blue-500 to-blue-600 text-white rounded-xl p-3 sm:p-2"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-white/80 text-xs sm:text-sm">Thời tiết</span>
@@ -93,7 +93,7 @@ onMounted(() => {
 
     <!-- USD/VND Rate -->
     <div
-      class="bg-linear-to-br from-green-500 to-green-600 text-white rounded-xl p-3 sm:p-4"
+      class="bg-linear-to-br from-green-500 to-green-600 text-white rounded-xl p-3 sm:p-2"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-white/80 text-xs sm:text-sm">USD/VND</span>
@@ -110,7 +110,7 @@ onMounted(() => {
 
     <!-- Gold Price -->
     <div
-      class="bg-linear-to-br from-yellow-500 to-yellow-600 text-white rounded-xl p-3 sm:p-4"
+      class="bg-linear-to-br from-yellow-500 to-yellow-600 text-white rounded-xl p-3 sm:p-2"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-white/80 text-xs sm:text-sm">Vàng</span>
@@ -120,14 +120,16 @@ onMounted(() => {
         <div class="text-base sm:text-xl lg:text-2xl font-bold">
           {{ displayMetalPrice(externalData.metals.gold, goldUnit) }}
         </div>
-        <div class="text-xs sm:text-sm text-white/80 capitalize">mỗi {{ goldUnit }}</div>
+        <div class="text-xs sm:text-sm text-white/80 capitalize">
+          mỗi {{ goldUnit }}
+        </div>
       </div>
       <div v-else class="text-white/60 text-xs sm:text-sm">Đang tải...</div>
     </div>
 
     <!-- Silver Price -->
     <div
-      class="bg-linear-to-br from-slate-400 to-slate-500 text-white rounded-xl p-3 sm:p-4"
+      class="bg-linear-to-br from-slate-400 to-slate-500 text-white rounded-xl p-3 sm:p-2"
     >
       <div class="flex items-center justify-between mb-2">
         <span class="text-white/80 text-xs sm:text-sm">Bạc</span>
@@ -137,7 +139,9 @@ onMounted(() => {
         <div class="text-base sm:text-xl lg:text-2xl font-bold">
           {{ displayMetalPrice(externalData.metals.silver, silverUnit) }}
         </div>
-        <div class="text-xs sm:text-sm text-white/80 capitalize">mỗi {{ silverUnit }}</div>
+        <div class="text-xs sm:text-sm text-white/80 capitalize">
+          mỗi {{ silverUnit }}
+        </div>
       </div>
       <div v-else class="text-white/60 text-xs sm:text-sm">Đang tải...</div>
     </div>

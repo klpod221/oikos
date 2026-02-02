@@ -298,7 +298,7 @@ async function handleExerciseDelete(id) {
           <div
             v-for="log in workout.workoutLogs"
             :key="log.id"
-            class="bg-white border border-slate-200 rounded-xl p-4"
+            class="bg-white border border-slate-200 rounded-xl p-2"
           >
             <div class="flex justify-between items-start mb-2">
               <h4 class="font-medium text-slate-800">
@@ -331,7 +331,7 @@ async function handleExerciseDelete(id) {
           <div
             v-for="schedule in workout.schedules"
             :key="schedule.id"
-            class="bg-white border border-slate-200 rounded-xl p-4"
+            class="bg-white border border-slate-200 rounded-xl p-2"
           >
             <div class="flex justify-between items-start">
               <div>

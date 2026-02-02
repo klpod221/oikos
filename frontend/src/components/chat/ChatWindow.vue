@@ -295,7 +295,7 @@ const handleSend = async (content) => {
 
     <div
       v-else
-      class="p-4 border-t border-gray-100 bg-gray-50 text-center text-gray-500"
+      class="p-2 border-t border-gray-100 bg-gray-50 text-center text-gray-500"
     >
       <p>Tính năng AI Chat đã bị tạm khóa bởi quản trị viên.</p>
     </div>

@@ -41,7 +41,7 @@ const handleKeydown = (e) => {
 </script>
 
 <template>
-  <div class="border-t border-gray-200 p-4 bg-white/95 backdrop-blur-sm">
+  <div class="border-t border-gray-200 p-2 bg-white/95 backdrop-blur-sm">
     <div
       class="max-w-3xl mx-auto relative rounded-xl border border-gray-300 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 bg-white transition-all"
     >

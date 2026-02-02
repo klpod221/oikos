@@ -88,6 +88,9 @@ Route::middleware(['auth:sanctum', 'user.active', \App\Http\Middleware\CheckMain
         Route::get('/user-goals', [\App\Http\Controllers\Api\Integration\EnergyBalanceController::class, 'getUserGoals']);
     });
 
+    // Mobile Notifications
+    Route::post('/notifications', [\App\Http\Controllers\Api\NotificationController::class, 'store']);
+
     // AI Chat (RAG + Function Calling + Streaming)
     Route::prefix('chat')->group(function () {
         Route::post('/send', [\App\Http\Controllers\Api\ChatController::class, 'send']);

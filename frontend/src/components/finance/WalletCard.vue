@@ -21,7 +21,7 @@ defineEmits(["edit", "delete"]);
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow"
+    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-5 hover:shadow-md transition-shadow"
   >
     <div class="flex items-start justify-between mb-2 sm:mb-3">
       <div
@@ -54,7 +54,9 @@ defineEmits(["edit", "delete"]);
         </a-dropdown>
       </div>
     </div>
-    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">{{ wallet.name }}</h3>
+    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">
+      {{ wallet.name }}
+    </h3>
     <p class="text-xs sm:text-sm text-slate-500 mb-2 sm:mb-3">
       {{ wallet.description || "Không có mô tả" }}
     </p>

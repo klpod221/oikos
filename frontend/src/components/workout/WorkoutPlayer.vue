@@ -115,7 +115,7 @@
                 </template>
               </a-progress>
               <div
-                class="mt-8 text-center bg-white/90 backdrop-blur-sm p-4 rounded-3xl border border-slate-100 shadow-sm w-full max-w-sm"
+                class="mt-8 text-center bg-white/90 backdrop-blur-sm p-2 rounded-3xl border border-slate-100 shadow-sm w-full max-w-sm"
               >
                 <span
                   class="block text-6xl lg:text-[8rem] leading-none font-black text-slate-800 tabular-nums"

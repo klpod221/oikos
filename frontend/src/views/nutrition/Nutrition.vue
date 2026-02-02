@@ -386,7 +386,7 @@ const handleNutritionLogSubmit = async (data) => {
           <div
             v-for="log in nutrition.nutritionLogs"
             :key="log.id"
-            class="bg-white border border-slate-200 rounded-xl p-4"
+            class="bg-white border border-slate-200 rounded-xl p-2"
           >
             <div class="flex justify-between items-start">
               <div>

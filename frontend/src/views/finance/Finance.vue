@@ -342,7 +342,7 @@ const handleCategoryDelete = async (id) => {
 
     <!-- Total Balance Card -->
     <div
-      class="bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl p-4 sm:p-6 text-white"
+      class="bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl p-2 sm:p-6 text-white"
     >
       <div class="flex items-center justify-between">
         <div>

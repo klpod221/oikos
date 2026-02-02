@@ -282,11 +282,11 @@ const toggleSidebar = () => {
 
       <!-- Content -->
       <a-layout-content
-        :class="route.meta.noLayoutPadding ? 'h-[calc(100vh-64px)]' : 'm-4'"
+        :class="route.meta.noLayoutPadding ? 'h-[calc(100vh-64px)]' : 'm-2'"
       >
         <div
           v-if="!route.meta.noLayoutPadding"
-          class="bg-white rounded-xl p-4 lg:p-6 max-h-[calc(100vh-96px)] overflow-y-auto overflow-x-hidden"
+          class="bg-white rounded-xl p-2 lg:p-6 max-h-[calc(100vh-96px)] overflow-y-auto overflow-x-hidden"
         >
           <slot />
         </div>

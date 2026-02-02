@@ -24,7 +24,7 @@ defineEmits(["edit", "delete", "view"]);
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow cursor-pointer group"
+    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-5 hover:shadow-md transition-shadow cursor-pointer group"
     @click="$emit('view', recipe)"
   >
     <div class="flex items-start justify-between mb-2 sm:mb-3">
@@ -34,7 +34,13 @@ defineEmits(["edit", "delete", "view"]);
         <CoffeeOutlined class="text-green-600 text-lg sm:text-xl" />
       </div>
       <a-dropdown>
-        <a-button type="text" size="small" @click.stop class="opacity-0 group-hover:opacity-100 transition-opacity">•••</a-button>
+        <a-button
+          type="text"
+          size="small"
+          @click.stop
+          class="opacity-0 group-hover:opacity-100 transition-opacity"
+          >•••</a-button
+        >
         <template #overlay>
           <a-menu>
             <a-menu-item @click="$emit('edit', recipe)">
@@ -52,7 +58,9 @@ defineEmits(["edit", "delete", "view"]);
         </template>
       </a-dropdown>
     </div>
-    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">{{ recipe.name }}</h3>
+    <h3 class="font-semibold text-slate-800 text-sm sm:text-base">
+      {{ recipe.name }}
+    </h3>
     <p class="text-xs sm:text-sm text-slate-500 mb-2 sm:mb-3 line-clamp-2">
       {{ recipe.description || "Không có mô tả" }}
     </p>

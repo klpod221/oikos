@@ -85,8 +85,10 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-6">
-    <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-slate-800 mb-2 sm:mb-3 lg:mb-4">
+  <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-6">
+    <h3
+      class="text-sm sm:text-base lg:text-lg font-semibold text-slate-800 mb-2 sm:mb-3 lg:mb-4"
+    >
       Xu hướng hàng ngày
     </h3>
     <div class="h-48 sm:h-60 lg:h-80">

@@ -36,6 +36,24 @@ class SyncGmailTransactions extends Command
             /** @var User $user */
             $this->info("Processing user: {$user->email}");
 
+            // Phase 3: Check if Android Notification is active for this user
+            // We assume if they have RECENT logs (last 24h), they are active.
+            // Or ideally use a setting. For now, let's use recent logs as heuristic
+            // to avoid complex settings if not requested.
+            // Actually, user explicitly asked "if android notification is turned on, then do not read from mail".
+            // Let's implement a check using SystemSetting or User attribute if available,
+            // but since we don't have that column yet, let's use a heuristic:
+            // "If we have ANY logs in notification_logs in the last 7 days, assume Android is primary and SKIP email."
+
+            $hasAndroidActivity = \App\Models\NotificationLog::where('user_id', $user->id)
+                ->where('created_at', '>', now()->subDays(7))
+                ->exists();
+
+            if ($hasAndroidActivity) {
+                $this->info("User has active Android Notifications. Skipping Email Sync to prevent duplicates.");
+                continue;
+            }
+
             try {
                 // Determine 'since' timestamp
                 // If reset, it will be null -> default to 30 days ago
@@ -45,7 +63,8 @@ class SyncGmailTransactions extends Command
 
                 $pageToken = null;
                 $pageCount = 0;
-                $maxPages = 5; // Safety limit to prevent timeouts in one run (e.g. 100 emails max)
+                $maxPages = 5;
+                $latestEmailDate = null; // Track the newest date encountered
 
                 do {
                     $pageCount++;
@@ -58,20 +77,25 @@ class SyncGmailTransactions extends Command
 
                     if (!empty($emails)) {
                         foreach ($emails as $email) {
-                            // Deduplication check (Double check, though Service also checks)
+                            // Track Latest Date
+                            $emailDate = \Carbon\Carbon::parse($email['date']);
+
+                            if (!$latestEmailDate || $emailDate->gt($latestEmailDate)) {
+                                $latestEmailDate = $emailDate;
+                            }
+
+                            // Deduplication check
                             if (Transaction::where('gmail_message_id', $email['message_id'])->exists()) {
                                 continue;
                             }
 
                             $this->info("Processing Email: {$email['subject']}");
 
+                            // ... AI Processing ...
                             // Determine Today's Date for AI context
                             $today = now()->format('Y-m-d');
-
-                            // Construct Prompt for AI Agent
                             $systemPrompt = <<<PROMPT
 You are an intelligent Financial Assistant. Your task is to process a bank notification email and create a transaction record in the system.
-
 1. **Analyze** the email content provided by the user.
 2. **Extract** details: Amount, Type (Income/Expense), Description, Date (use email date if available, otherwise today: {$today}).
 3. **Reasoning**:
@@ -79,13 +103,10 @@ You are an intelligent Financial Assistant. Your task is to process a bank notif
    - "Số dư tăng" -> Income.
    - "Số dư giảm" -> Expense.
 4. **Action**:
-   - First, call `get_wallets` to identify the user's wallet (e.g., "Tiền mặt", "Chi tiêu").
-   - Call `get_categories` to find a relevant category (e.g., "Thu nhập khác", "Chi tiêu khác").
-   - Finally, call `create_transaction` with the valid wallet name and category name you found.
-   - Amount must be a positive number.
-   - Description should be concise.
-   - **CRITICAL**: Use the `gmail_message_id` provided in the context if the tool supports it, or ensure duplication is handled.
-   - If you cannot determine the details, do nothing or log a warning.
+   - First, call `get_wallets` to identify the user's wallet.
+   - Call `get_categories` to find a relevant category.
+   - Finally, call `create_transaction` with the valid wallet name and category name.
+   - **CRITICAL**: Use the `gmail_message_id` provided in the context.
 PROMPT;
 
                             $userMessage = <<<MSG
@@ -94,27 +115,15 @@ Email Date: {$email['date']}
 Email Snippet: {$email['snippet']}
 Email Body:
 {$email['body']}
-
 Message ID: {$email['message_id']}
-
 Please create a transaction for this email.
 MSG;
 
-                            // Execute AI Agent
-                            $response = $chatService->runWithTools($user->id, $systemPrompt, $userMessage);
-
-                            $this->info("AI Response: " . substr($response, 0, 100));
-
-                            // Manual Linkage Hack (if tools didn't handle ID)
-                            $latestTx = Transaction::where('user_id', $user->id)
-                                ->latest()
-                                ->first();
-
-                            if ($latestTx && $latestTx->created_at->diffInSeconds(now()) < 15) {
-                                $latestTx->update(['gmail_message_id' => $email['message_id']]);
-                                $this->info("Transaction created and linked to Email ID.");
-                            } else {
-                                $this->warn("AI processing check: No new transaction detected immediately.");
+                            try {
+                                $response = $chatService->runWithTools($user->id, $systemPrompt, $userMessage);
+                                $this->info("AI Response: " . substr($response, 0, 100));
+                            } catch (\Exception $aiEx) {
+                                $this->error("AI Failed for email {$email['message_id']}: " . $aiEx->getMessage());
                             }
                         }
                     }
@@ -126,13 +135,20 @@ MSG;
                     }
                 } while ($pageToken);
 
-                // Only update the sync timestamp if we successfully processed everything (nextPageToken is null)
-                // and we didn't hit the max pages limit (which leaves work unfinished)
-                if ($pageToken === null && $pageCount < $maxPages) {
-                    $user->update(['last_gmail_sync_at' => now()]);
-                    $this->info("Sync fully completed. Updated last_gmail_sync_at.");
+                // Update timestamp to the LATEST email date we processed + 1 second
+                // This ensures next run starts AFTER this email.
+                if ($latestEmailDate) {
+                    $user->update(['last_gmail_sync_at' => $latestEmailDate->addSecond()]);
+                    $this->info("Updated last_gmail_sync_at to: " . $latestEmailDate->toDateTimeString());
                 } else {
-                    $this->info("Sync partial or limited. Keeping old timestamp to resume next time.");
+                    // If no new emails found, update to NOW so we don't query old range again unnecessarily?
+                    // Or keep old check.
+                    // Better to set to NOW if we successfully checked up to NOW.
+                    // But if pageToken was null (no next page), we are caught up.
+                    if ($pageToken === null) {
+                        $user->update(['last_gmail_sync_at' => now()]);
+                        $this->info("Caught up. Updated last_gmail_sync_at to NOW.");
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error("Gmail Sync Failed: " . $e->getMessage());

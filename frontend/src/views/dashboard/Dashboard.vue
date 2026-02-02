@@ -119,7 +119,7 @@ function formatWorkoutDate(dateString) {
     <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <button
         @click="toggleHealth"
-        class="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
+        class="w-full flex items-center justify-between p-2 hover:bg-slate-50 transition-colors"
       >
         <div class="flex items-center gap-2">
           <HeartOutlined class="text-red-500" />
@@ -129,7 +129,7 @@ function formatWorkoutDate(dateString) {
         <UpOutlined v-else class="text-slate-400" />
       </button>
 
-      <div v-if="healthExpanded" class="border-t border-slate-200 p-4">
+      <div v-if="healthExpanded" class="border-t border-slate-200 p-2">
         <a-spin :spinning="integration.loading || workout.loading">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Macros -->
@@ -259,7 +259,7 @@ function formatWorkoutDate(dateString) {
         <TopExpensesTable :top-expenses="dashboard.statistics.top_expenses" />
 
         <!-- Savings Goals Progress -->
-        <div class="bg-white border border-slate-200 rounded-xl p-4 lg:p-6">
+        <div class="bg-white border border-slate-200 rounded-xl p-2 lg:p-6">
           <h3
             class="text-base lg:text-lg font-semibold text-slate-800 mb-2 lg:mb-4"
           >

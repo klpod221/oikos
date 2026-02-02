@@ -129,7 +129,7 @@ function formatGoalType(type) {
         </template>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- User Stats Card -->
-          <div class="bg-white border border-slate-200 rounded-lg p-4">
+          <div class="bg-white border border-slate-200 rounded-lg p-2">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold text-slate-800">📊 Thông tin cơ thể</h3>
               <a-button size="small" type="link">Cập nhật</a-button>
@@ -170,7 +170,7 @@ function formatGoalType(type) {
           </div>
 
           <!-- User Goals Card -->
-          <div class="bg-white border border-slate-200 rounded-lg p-4">
+          <div class="bg-white border border-slate-200 rounded-lg p-2">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold text-slate-800">🎯 Mục tiêu</h3>
               <a-button size="small" type="link">Cập nhật</a-button>

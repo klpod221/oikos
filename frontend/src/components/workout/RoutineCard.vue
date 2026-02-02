@@ -26,7 +26,7 @@ defineEmits(["edit", "delete", "start"]);
 
 <template>
   <div
-    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 lg:p-5 hover:shadow-md transition-shadow cursor-pointer group"
+    class="bg-white border border-slate-200 rounded-xl p-3 sm:p-2 lg:p-5 hover:shadow-md transition-shadow cursor-pointer group"
     @click="$emit('start', routine)"
   >
     <div class="flex items-start justify-between mb-2 sm:mb-3">

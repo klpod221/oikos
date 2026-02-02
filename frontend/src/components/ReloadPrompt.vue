@@ -12,7 +12,7 @@ const close = () => {
 <template>
   <div
     v-if="offlineReady || needRefresh"
-    class="fixed bottom-4 right-4 z-50 p-4 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2 max-w-sm transition-all"
+    class="fixed bottom-4 right-4 z-50 p-2 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 flex flex-col gap-2 max-w-sm transition-all"
     role="alert"
   >
     <div class="mb-2">

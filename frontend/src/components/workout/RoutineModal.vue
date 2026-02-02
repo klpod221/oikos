@@ -144,7 +144,7 @@ const handleOk = () => {
 
       <a-divider>Danh sách bài tập</a-divider>
 
-      <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+      <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
         <div
           v-for="(item, index) in form.exercises"
           :key="index"

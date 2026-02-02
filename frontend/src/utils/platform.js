@@ -14,30 +14,12 @@ export const isTauri = () => {
  */
 export const getPlatform = async () => {
   if (!isTauri()) return "web";
-
-  let attempts = 0;
-  const maxAttempts = 3;
-
-  while (attempts < maxAttempts) {
-    try {
-      // Use type() as it's the standard for OS checks 'android', 'ios', etc.
-      // Dynamic import to avoid load-time errors if plugin is missing?
-      // No, import is already top-level.
-      return await platform();
-    } catch (error) {
-      console.warn(
-        `Attempt ${attempts + 1} failed to check OS platform:`,
-        error,
-      );
-      attempts++;
-      if (attempts >= maxAttempts) {
-        return "unknown";
-      }
-      // Wait 500ms before retrying
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
+  try {
+    return await platform();
+  } catch (error) {
+    console.warn("Failed to check OS platform:", error);
+    return "unknown";
   }
-  return "unknown";
 };
 
 /**

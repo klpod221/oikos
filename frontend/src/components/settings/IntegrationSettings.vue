@@ -12,7 +12,7 @@ import {
   SyncOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons-vue";
-import api from "../../utils/axios";
+import { authService } from "../../services/auth.service";
 import { useAuthStore } from "../../stores/auth";
 
 const auth = useAuthStore();
@@ -25,7 +25,7 @@ const disconnectGoogle = () => {
 
 const connectGoogle = async () => {
   try {
-    const response = await api.get("/auth/google/url");
+    const response = await authService.getGoogleAuthUrl();
     if (response.data.url) {
       globalThis.location.href = response.data.url;
     }

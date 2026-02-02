@@ -21,3 +21,14 @@ node_modules/
 cli-proxy-auth/*
 !cli-proxy-auth/.gitkeep
 cli-proxy-config.yaml
+
+# Tauri / App
+app/node_modules
+app/src-tauri/target
+app/src-tauri/gen/android
+app/src-tauri/gen/schemas
+app/src-tauri/gen/capability
+!app/src-tauri/gen/android/build.gradle.kts
+!app/src-tauri/gen/android/app/build.gradle.kts
+!app/src-tauri/gen/android/app/proguard-rules.pro
+!app/src-tauri/gen/android/app/src/main/AndroidManifest.xml

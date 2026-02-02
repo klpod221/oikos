@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons-vue";
 import EnergyBalanceDashboard from "../../components/integration/EnergyBalanceDashboard.vue";
 import MacroProgressBar from "../../components/nutrition/MacroProgressBar.vue";
-import axios from "axios";
+import { integrationService } from "../../services/integration.service";
 import { useAuthStore } from "../../stores/auth";
 
 const auth = useAuthStore();
@@ -34,8 +34,8 @@ watch(selectedDate, async () => {
 
 async function loadMacroProgress() {
   try {
-    const response = await axios.get("/api/nutrition/macros/progress", {
-      params: { date: selectedDate.value },
+    const response = await integrationService.getMacrosProgress({
+      date: selectedDate.value,
     });
     macroProgress.value = response.data;
   } catch (error) {
@@ -46,7 +46,7 @@ async function loadMacroProgress() {
 async function loadUserStats() {
   loading.value = true;
   try {
-    const response = await axios.get("/api/integration/user-stats");
+    const response = await integrationService.getUserStats();
     userStats.value = response.data;
   } catch (error) {
     console.error("Failed to load user stats:", error);
@@ -57,7 +57,7 @@ async function loadUserStats() {
 
 async function loadUserGoals() {
   try {
-    const response = await axios.get("/api/integration/user-goals");
+    const response = await integrationService.getUserGoals();
     userGoals.value = response.data;
   } catch (error) {
     console.error("Failed to load user goals:", error);

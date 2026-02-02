@@ -123,7 +123,7 @@ const toggleSidebar = () => {
     <!-- Mobile Drawer Sidebar -->
     <aside
       v-if="isMobile"
-      class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform transition-transform duration-300"
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform transition-transform duration-300 pt-[env(safe-area-inset-top)]"
       :class="mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <div
@@ -179,7 +179,7 @@ const toggleSidebar = () => {
       collapsible
       :width="240"
       :collapsed-width="64"
-      class="bg-slate-900!"
+      class="bg-slate-900! pt-[env(safe-area-inset-top)]"
     >
       <div
         class="h-16 flex items-center justify-center border-b border-slate-800 gap-2"
@@ -227,7 +227,7 @@ const toggleSidebar = () => {
     <a-layout>
       <!-- Header -->
       <a-layout-header
-        class="bg-white! px-4! flex items-center justify-between shadow-sm sticky top-0 z-30 h-16!"
+        class="bg-white! px-4! flex items-center justify-between shadow-sm sticky top-0 z-30 h-[calc(4rem+env(safe-area-inset-top))]! pt-[env(safe-area-inset-top)]!"
       >
         <!-- Mobile: Hamburger -->
         <button

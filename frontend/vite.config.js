@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
-        name: "Oikos",
-        short_name: "Oikos",
-        description: "Oikos Personal Finance & Life Management",
+        name: "OikOS",
+        short_name: "OikOS",
+        description: "OikOS Personal Finance & Life Management",
         theme_color: "#ffffff",
         icons: [
           {

@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>Oikos: Personal Finance & Smart Assistant</h1>
+    <h1>OikOS: Personal Finance & Smart Assistant</h1>
     <p>A powerful personal finance, nutrition, and lifestyle management system with an integrated AI assistant. Automates transaction syncing, tracks assets, and manages daily life with advanced data visualization.</p>
     <img src="https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel&labelColor=111827" alt="Laravel">
     <img src="https://img.shields.io/badge/Vue.js-3.0-4FC08D?style=for-the-badge&logo=vue.js&labelColor=111827" alt="Vue.js">
@@ -13,9 +13,9 @@
 
 ## 📝 Description
 
-**Oikos** is a comprehensive lifestyle management platform designed to bring order to your finances, health, and daily productivity. It combines automated financial tracking through Gmail integration, precious metals monitoring, and detailed nutrition planning into a single, cohesive dashboard.
+**OikOS** is a comprehensive lifestyle management platform designed to bring order to your finances, health, and daily productivity. It combines automated financial tracking through Gmail integration, precious metals monitoring, and detailed nutrition planning into a single, cohesive dashboard.
 
-At its core is a smart AI Assistant capable of managing transactions, generating meal plans, and providing insights into your spending habits. Whether you're tracking improved net worth or optimizing your workout schedule, Oikos serves as your central hub for personal growth.
+At its core is a smart AI Assistant capable of managing transactions, generating meal plans, and providing insights into your spending habits. Whether you're tracking improved net worth or optimizing your workout schedule, OikOS serves as your central hub for personal growth.
 
 ## 🚀 Table Of Content
 
@@ -67,7 +67,7 @@ At its core is a smart AI Assistant capable of managing transactions, generating
 
 ### 🐳 Using Docker (Recommended)
 
-The easiest way to get Oikos running is using Docker Compose.
+The easiest way to get OikOS running is using Docker Compose.
 
 1. Clone the repository
 ```bash

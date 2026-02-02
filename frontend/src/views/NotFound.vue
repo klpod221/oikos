@@ -4,7 +4,7 @@
   >
     <div class="w-full max-w-lg text-center">
       <div class="mb-8 animate-pulse">
-        <img src="/logo.png" alt="Oikos Logo" class="h-20 w-auto mx-auto" />
+        <img src="/logo.png" alt="OikOS Logo" class="h-20 w-auto mx-auto" />
       </div>
 
       <a-result

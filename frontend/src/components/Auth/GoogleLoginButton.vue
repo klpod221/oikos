@@ -6,7 +6,7 @@
 <script setup>
 import { GoogleOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
-import api from "../../utils/axios";
+import { authService } from "../../services/auth.service";
 import { message } from "ant-design-vue";
 
 const loading = ref(false);
@@ -14,7 +14,7 @@ const loading = ref(false);
 const handleGoogleLogin = async () => {
   loading.value = true;
   try {
-    const response = await api.get("/auth/google/url");
+    const response = await authService.getGoogleAuthUrl();
     if (response.data.url) {
       globalThis.location.href = response.data.url;
     }

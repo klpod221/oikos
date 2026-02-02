@@ -3,7 +3,7 @@
  * Handles SSE streaming manually to support Bearer token authentication.
  */
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+import config from "../config/app";
 
 export const chatService = {
   /**
@@ -16,7 +16,7 @@ export const chatService = {
    */
   async streamMessage(message, token, onChunk, onComplete, onError) {
     try {
-      const response = await fetch(`${API_URL}/chat/send`, {
+      const response = await fetch(`${config.api.baseUrl}/chat/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -9,7 +9,7 @@ import { onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import { message } from "ant-design-vue";
-import api from "../../utils/axios";
+import { authService } from "../../services/auth.service";
 
 const route = useRoute();
 const router = useRouter();
@@ -28,7 +28,7 @@ onMounted(async () => {
 
   try {
     // Forward the entire query string to the backend
-    const response = await api.post("/auth/google/callback", {
+    const response = await authService.googleCallback({
       ...query,
       device_name: "web",
     });

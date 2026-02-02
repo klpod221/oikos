@@ -26,7 +26,7 @@ onMounted(async () => {
     class="flex items-center justify-center min-h-screen bg-white"
   >
     <div class="flex flex-col items-center gap-4 animate-pulse">
-      <img src="/logo.png" alt="Oikos Logo" class="h-16 w-auto" />
+      <img src="/logo.png" alt="OikOS Logo" class="h-16 w-auto" />
     </div>
   </div>
   <component :is="layout" v-else>

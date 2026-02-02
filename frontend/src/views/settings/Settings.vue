@@ -9,7 +9,8 @@
   - Security: Password change
 -->
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { isAndroid as checkAndroid } from "../../utils/platform";
 import {
   UserOutlined,
   SettingOutlined,
@@ -27,16 +28,13 @@ import PasswordForm from "../../components/settings/PasswordForm.vue";
 import UserStatsForm from "../../components/settings/UserStatsForm.vue";
 import UserGoalsForm from "../../components/settings/UserGoalsForm.vue";
 import IntegrationSettings from "../../components/settings/IntegrationSettings.vue";
-import NotificationSettings from "./NotificationSettings.vue"; // Relative import since in same folder
+import NotificationSettings from "../../components/settings/NotificationSettings.vue";
 
 const activeKey = ref("profile");
 const isAndroid = ref(false);
 
-import { onMounted } from "vue";
-onMounted(() => {
-  if (window.AndroidNotification) {
-    isAndroid.value = true;
-  }
+onMounted(async () => {
+  isAndroid.value = await checkAndroid();
 });
 </script>
 

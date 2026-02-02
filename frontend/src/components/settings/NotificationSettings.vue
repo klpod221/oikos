@@ -18,7 +18,7 @@ const newPackage = ref("");
 
 // Common VN Banking Apps for quick add
 const commonApps = [
-  { name: "Vietcombank", package: "com.VCB.MobileBanking" },
+  { name: "Vietcombank", package: "com.VCB" },
   { name: "Techcombank", package: "vn.com.techcombank.bb.app" },
   { name: "MB Bank", package: "com.mbmobile" },
   { name: "BIDV", package: "com.vnpay.bidv" },
@@ -30,15 +30,19 @@ const commonApps = [
   { name: "ZaloPay", package: "vn.com.vng.zalopay" },
 ];
 
-const checkEnvironment = () => {
-  // Check if Bridge exists
-  if (window.AndroidNotification) {
-    isAndroid.value = true;
-    hasPermission.value = window.AndroidNotification.checkPermission();
+import { isAndroid as checkAndroid } from "../../utils/platform";
+
+const checkEnvironment = async () => {
+  // Use centralized platform check
+  isAndroid.value = await checkAndroid();
+
+  // Check if Bridge exists for functionality
+  if (globalThis.AndroidNotification) {
+    hasPermission.value = globalThis.AndroidNotification.checkPermission();
     loadWhitelist();
   } else {
     // Fallback or dev mode
-    console.warn("AndroidNotification bridge not found.");
+    console.warn("AndroidNotification bridge not found (yet).");
   }
 };
 
